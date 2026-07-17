@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="EmpateLive simulador" xmlns="http://www.topografix.com/GPX/1/1">
+  <trk>
+    <name>5K de ejemplo (bucle en Madrid)</name>
+    <trkseg>
+      <trkpt lat="40.416775" lon="-3.703790"></trkpt>
+      <trkpt lat="40.418500" lon="-3.701200"></trkpt>
+      <trkpt lat="40.420800" lon="-3.699500"></trkpt>
+      <trkpt lat="40.423200" lon="-3.700100"></trkpt>
+      <trkpt lat="40.425100" lon="-3.702800"></trkpt>
+      <trkpt lat="40.424600" lon="-3.706500"></trkpt>
+      <trkpt lat="40.422300" lon="-3.709200"></trkpt>
+      <trkpt lat="40.419700" lon="-3.708800"></trkpt>
+      <trkpt lat="40.417600" lon="-3.706400"></trkpt>
+      <trkpt lat="40.416775" lon="-3.703790"></trkpt>
+    </trkseg>
+  </trk>
+</gpx>

@@ -1,0 +1,54 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: empatelive
+      POSTGRES_PASSWORD: empatelive
+      POSTGRES_DB: empatelive
+    ports:
+      - "5433:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U empatelive"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: ./api
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql+psycopg://empatelive:empatelive@db:5432/empatelive
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./api:/app:Z
+    depends_on:
+      db:
+        condition: service_healthy
+    command: >
+      sh -c "alembic upgrade head &&
+             python -m seed.seed &&
+             uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+
+  # Simula el ingress del túnel (cloudflared/nginx-verificacion.conf) para probar
+  # la restricción de superficie sin necesitar una cuenta real de Cloudflare
+  # (Anexo B §2). No arranca con `docker compose up`: requiere el perfil
+  # `verificacion-tunel` (`docker compose --profile verificacion-tunel up -d`).
+  tunel-simulado:
+    image: nginx:alpine
+    restart: "no"
+    volumes:
+      - ./cloudflared/nginx-verificacion.conf:/etc/nginx/nginx.conf:ro,Z
+    ports:
+      - "8888:80"
+    depends_on:
+      - api
+    profiles:
+      - verificacion-tunel
+
+volumes:
+  db_data:

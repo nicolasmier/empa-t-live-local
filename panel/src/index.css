@@ -1,0 +1,537 @@
+:root {
+  --azul-oscuro: #0a1240;
+  --azul: #0f2472;
+  --azul-acento: #3d6bf0;
+  --texto: #161a2b;
+  --texto-suave: #6b7280;
+  --superficie: #ffffff;
+  --fondo: #f5f6fa;
+  --borde: #e6e8ef;
+  --verde: #1a9b52;
+  --ambar: #c78500;
+  --rojo: #c72f2f;
+
+  font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
+  color-scheme: light;
+  color: var(--texto);
+  background: var(--fondo);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+}
+
+input,
+select,
+textarea,
+button {
+  font: inherit;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  border: 1px solid var(--borde);
+  background: var(--superficie);
+  color: var(--texto);
+}
+
+textarea {
+  min-height: 5rem;
+  resize: vertical;
+}
+
+button {
+  cursor: pointer;
+  background: var(--azul);
+  color: #fff;
+  border-color: var(--azul);
+  font-weight: 600;
+}
+
+button:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+button.boton-enlace {
+  background: transparent;
+  color: var(--azul-acento);
+  border: none;
+  padding: 0.25rem 0.5rem;
+  font-weight: 500;
+}
+
+button.boton-peligro {
+  background: var(--rojo);
+  border-color: var(--rojo);
+}
+
+button.boton-enlace--peligro {
+  color: var(--rojo);
+}
+
+fieldset {
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 0;
+}
+
+legend {
+  padding: 0 0.4rem;
+  font-weight: 600;
+  color: var(--texto-suave);
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.9rem;
+  color: var(--texto-suave);
+  margin-bottom: 0.75rem;
+}
+
+label.casilla {
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0.75rem;
+}
+
+th,
+td {
+  text-align: left;
+  padding: 0.55rem 0.6rem;
+  border-bottom: 1px solid var(--borde);
+}
+
+th {
+  color: var(--texto-suave);
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+tr.fila-clicable {
+  cursor: pointer;
+}
+
+tr.fila-clicable:hover {
+  background: var(--fondo);
+}
+
+.error {
+  color: var(--rojo);
+}
+
+.aviso-ok {
+  color: var(--verde);
+}
+
+.aviso-atencion {
+  color: var(--ambar);
+  font-size: 0.85rem;
+}
+
+.texto-vacio {
+  color: var(--texto-suave);
+}
+
+/* --- App shell --- */
+
+.pantalla-login {
+  max-width: 360px;
+  margin: 4rem auto;
+  padding: 2rem;
+  background: var(--superficie);
+  border-radius: 12px;
+}
+
+.pantalla-login h1 {
+  font-size: 1.4rem;
+  margin-bottom: 1.5rem;
+  color: var(--azul-oscuro);
+}
+
+.app-panel__contenido {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+.cabecera-panel {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 0.9rem 1.5rem;
+  background: var(--azul-oscuro);
+  color: #fff;
+}
+
+.cabecera-panel__marca {
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.cabecera-panel__marca span {
+  color: var(--azul-acento);
+}
+
+.cabecera-panel h1 {
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: #cfd6f7;
+  flex: 1;
+}
+
+.cabecera-panel__nav {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.cabecera-panel__rol {
+  font-size: 0.8rem;
+  color: #cfd6f7;
+  padding: 0.2rem 0.6rem;
+  border: 1px solid #2c3a7a;
+  border-radius: 999px;
+}
+
+.enlace-nav {
+  background: transparent;
+  border: none;
+  color: #cfd6f7;
+  font-weight: 500;
+}
+
+.enlace-nav--activo {
+  color: #fff;
+  text-decoration: underline;
+}
+
+/* --- Secciones y tarjetas --- */
+
+.panel-seccion {
+  background: var(--superficie);
+  border-radius: 10px;
+  padding: 1.5rem;
+}
+
+.panel-seccion__cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.formulario-tarjeta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 1rem;
+  background: var(--fondo);
+  border-radius: 8px;
+  margin-bottom: 1.25rem;
+}
+
+.formulario-tarjeta--fila {
+  flex-direction: row;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.formulario-tarjeta--fila label {
+  margin-bottom: 0;
+  flex: 1;
+  min-width: 160px;
+}
+
+.formulario-tarjeta__acciones {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.bloque-pestana {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.lista-tarjetas {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.tarjeta {
+  background: var(--fondo);
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.tarjeta__cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.tarjeta__acciones {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.tarjeta__edicion-nombre {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.tarjeta__edicion-nombre input {
+  flex: 1;
+}
+
+.lista-simple {
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.lista-simple li {
+  padding: 0.6rem 0.75rem;
+  background: var(--fondo);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.lista-simple__edicion {
+  flex-wrap: wrap;
+}
+
+.lista-simple__edicion input,
+.lista-simple__edicion textarea {
+  flex: 1;
+  min-width: 140px;
+}
+
+.vista-previa-cartel {
+  max-width: 220px;
+  border-radius: 6px;
+  display: block;
+  margin-bottom: 0.75rem;
+}
+
+/* --- Pestañas del detalle de evento --- */
+
+.pestanas-panel {
+  display: flex;
+  gap: 0.4rem;
+  border-bottom: 1px solid var(--borde);
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.pestanas-panel__item {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--texto-suave);
+  border-radius: 0;
+  padding: 0.6rem 0.9rem;
+  font-weight: 500;
+}
+
+.pestanas-panel__item--activo {
+  color: var(--azul);
+  border-bottom-color: var(--azul-acento);
+}
+
+.selector-distancia {
+  max-width: 260px;
+}
+
+/* --- Insignias de estado --- */
+
+.insignia {
+  display: inline-block;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  background: var(--borde);
+  color: var(--texto);
+}
+
+.insignia--ok {
+  background: #e3f6ea;
+  color: var(--verde);
+}
+
+.insignia--pendiente {
+  background: #fbebc7;
+  color: var(--ambar);
+}
+
+.insignia--en_directo {
+  background: #e3f6ea;
+  color: var(--verde);
+}
+
+.insignia--publicado,
+.insignia--preparacion {
+  background: #e4ebfd;
+  color: var(--azul-acento);
+}
+
+.insignia--finalizado {
+  background: var(--borde);
+  color: var(--texto-suave);
+}
+
+.insignia--archivado {
+  background: #f0f0f0;
+  color: var(--texto-suave);
+}
+
+.insignia-estado {
+  display: inline-block;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+/* --- Control de estado --- */
+
+.control-estado {
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--borde);
+}
+
+.control-estado__botones {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin: 0.6rem 0;
+}
+
+/* --- Modal de confirmación --- */
+
+.modal-fondo {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 18, 64, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+
+.modal {
+  background: var(--superficie);
+  border-radius: 10px;
+  padding: 1.5rem;
+  max-width: 420px;
+}
+
+.modal__acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  margin-top: 1.25rem;
+}
+
+/* --- Incidencias --- */
+
+.aviso-nuevas {
+  background: #fbebc7;
+  color: var(--ambar);
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.filtros-linea {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.filtros-linea .enlace-nav {
+  color: var(--texto-suave);
+}
+
+.filtros-linea .enlace-nav--activo {
+  color: var(--azul);
+}
+
+/* --- Informe de importación --- */
+
+.informe-importacion {
+  background: var(--fondo);
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.tabla-compacta th,
+.tabla-compacta td {
+  padding: 0.35rem 0.5rem;
+  font-size: 0.85rem;
+}
+
+/* --- Selección y edición en tablas (Corredores) --- */
+
+.barra-seleccion {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 0.9rem;
+  background: var(--fondo);
+  border-radius: 8px;
+}
+
+.tabla__acciones-fila {
+  display: flex;
+  gap: 0.5rem;
+  white-space: nowrap;
+}
+
+.input-compacto {
+  width: 100%;
+  min-width: 80px;
+  padding: 0.3rem 0.5rem;
+}
+
+.fila-edicion__nombre {
+  display: flex;
+  gap: 0.4rem;
+}

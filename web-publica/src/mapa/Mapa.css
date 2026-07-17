@@ -1,0 +1,42 @@
+.mapa {
+  width: 100%;
+  /* La proporción real se fija por JS en cuanto se conoce el bbox del GPX
+     (para que el mapa se ciña al recorrido); esto es solo el estado inicial
+     antes de esa medida. */
+  aspect-ratio: 16 / 9;
+  min-height: 380px;
+  max-height: 74vh;
+  background: var(--azul-oscuro);
+}
+
+/* Marcador circular minimalista: foto en miniatura o dorsal, con un anillo
+   fino del color de estado. Sin sombras ni bordes pesados. */
+.marcador-corredor__anillo {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border-width: 3px;
+  border-style: solid;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(10, 18, 64, 0.25);
+  font-weight: 700;
+  font-size: 12.5px;
+  color: #161a2b;
+  font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
+}
+
+.marcador-corredor__anillo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Leaflet: quitar el fondo/sombra por defecto de los divIcon. */
+.leaflet-div-icon {
+  background: transparent;
+  border: none;
+}

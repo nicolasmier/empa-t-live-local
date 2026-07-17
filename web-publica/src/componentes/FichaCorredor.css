@@ -1,0 +1,104 @@
+.ficha {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 1000;
+  background: var(--azul-superficie-clara);
+  border: 1px solid var(--azul-borde);
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  padding: 1.25rem 1.5rem 1.5rem;
+  width: min(320px, calc(100vw - 2rem));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.4rem;
+  color: var(--texto);
+}
+
+.ficha__cerrar {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.6rem;
+  border: none;
+  background: transparent;
+  color: var(--texto-suave);
+  cursor: pointer;
+  padding: 0.35rem;
+  border-radius: 999px;
+  line-height: 0;
+}
+
+.ficha__cerrar:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.ficha__foto {
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--azul-acento);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.ficha__foto img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ficha__dorsal {
+  margin: 0;
+  color: var(--texto-suave);
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.ficha__nombre {
+  margin: 0.15rem 0 0;
+  font-size: 1.15rem;
+}
+
+.ficha__club {
+  margin: 0;
+  color: var(--texto-suave);
+}
+
+.ficha__favorito {
+  margin-top: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid var(--azul-borde);
+  background: var(--azul-superficie);
+  color: var(--texto-suave);
+  font: inherit;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.ficha__favorito--activo {
+  background: rgba(240, 195, 109, 0.18);
+  border-color: #f0c36d;
+  color: #f0c36d;
+}
+
+@media (max-width: 480px) {
+  .ficha {
+    left: 1rem;
+    right: 1rem;
+    width: auto;
+  }
+}

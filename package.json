@@ -1,0 +1,12 @@
+{
+  "name": "empatelive-web",
+  "private": true,
+  "workspaces": [
+    "panel",
+    "web-publica",
+    "web-shared"
+  ],
+  "scripts": {
+    "generar-tipos-api": "npm run generar-tipos --workspace web-shared"
+  }
+}

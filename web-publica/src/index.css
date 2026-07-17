@@ -1,0 +1,79 @@
+/* Pantalla fija del recinto: tema único (no sigue prefers-color-scheme), para
+   que se vea igual en cualquier pantalla/proyector conectado. Azul unificado,
+   tono bajado para ser coherente con la marca (empa-t.com: theme-color
+   #1a227e y azules #1c6ebf/#1b54a9 en cabecera y secciones), sin fondos
+   blancos. */
+:root {
+  --azul-oscuro: #171f6e;
+  --azul-superficie: #1f2c86;
+  --azul-superficie-clara: #283a9c;
+  --azul-borde: #364aa8;
+  --azul-acento: #3d6bf0;
+  --texto: #f4f6ff;
+  --texto-suave: #b7c0e6;
+
+  font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
+  color: var(--texto);
+  background: var(--azul-oscuro);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+h1,
+h2,
+h3 {
+  font-weight: 700;
+}
+
+a {
+  color: var(--azul-acento);
+}
+
+.estado-vacio {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--texto-suave);
+  font-size: 1.1rem;
+  padding: 2rem;
+  text-align: center;
+}
+
+/* Pestañas por distancia — minimalistas, sin fondo de "caja" salvo la activa. */
+.pestanas {
+  display: flex;
+  gap: 0.25rem;
+  padding: 0 1.25rem;
+  border-bottom: 1px solid var(--azul-borde);
+  overflow-x: auto;
+}
+
+.pestanas__item {
+  padding: 0.7rem 1rem;
+  border: none;
+  background: transparent;
+  font: inherit;
+  font-weight: 600;
+  color: var(--texto-suave);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+}
+
+.pestanas__item--activo {
+  color: var(--texto);
+  border-bottom-color: var(--azul-acento);
+}

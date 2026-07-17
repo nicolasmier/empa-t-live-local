@@ -1,0 +1,82 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: empatelive
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?define POSTGRES_PASSWORD en .env}
+      POSTGRES_DB: empatelive
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U empatelive"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: ./api
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql+psycopg://empatelive:${POSTGRES_PASSWORD:?define POSTGRES_PASSWORD en .env}@db:5432/empatelive
+      SECRET_KEY: ${SECRET_KEY:?define SECRET_KEY en .env}
+      BACKUP_PASSPHRASE: ${BACKUP_PASSPHRASE:?define BACKUP_PASSPHRASE en .env}
+      BACKUP_DIR_SECUNDARIO: ${BACKUP_DIR_SECUNDARIO:-}
+      ADMIN_BOOTSTRAP_EMAIL: ${ADMIN_BOOTSTRAP_EMAIL:-admin@localhost}
+    ports:
+      # Panel y web pública son LAN-only (Anexo B §2): no se publican a internet;
+      # el túnel (servicio `cloudflared`) solo enruta la API del corredor.
+      - "8000:8000"
+    volumes:
+      - api_storage:/app/storage
+    depends_on:
+      db:
+        condition: service_healthy
+    command: >
+      sh -c "alembic upgrade head &&
+             python -m scripts.bootstrap_admin &&
+             uvicorn app.main:app --host 0.0.0.0 --port 8000"
+
+  # Panel y web pública (spec v10 §9: LAN-only, `:8080`/`:8081`). Sirven los
+  # `dist/` ya compilados (`npm run build --workspace panel`/`web-publica`) —
+  # sin build en el propio `docker compose up`, arranque instantáneo.
+  panel:
+    image: nginx:alpine
+    restart: unless-stopped
+    volumes:
+      - ./panel/dist:/usr/share/nginx/html:ro,Z
+    ports:
+      - "8080:80"
+    depends_on:
+      - api
+
+  web-publica:
+    image: nginx:alpine
+    restart: unless-stopped
+    volumes:
+      - ./web-publica/dist:/usr/share/nginx/html:ro,Z
+    ports:
+      - "8081:80"
+    depends_on:
+      - api
+
+  # Túnel Cloudflare (Anexo D): requiere cuenta y dominio propios (SUP-006), un
+  # tunnel nombrado ya creado y cloudflared/config.yml con sus valores reales
+  # (placeholders sustituidos) — ver docs/guia_tunel_cloudflare.md paso a paso.
+  # No se activa por defecto (perfil `tunel`) para que `docker compose up`
+  # funcione sin él mientras no esté configurado.
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    command: tunnel --config /etc/cloudflared/config.yml run
+    volumes:
+      - ./cloudflared:/etc/cloudflared:ro
+    depends_on:
+      - api
+    profiles:
+      - tunel
+
+volumes:
+  db_data:
+  api_storage:

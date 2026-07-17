@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EmpateLive — Panel de control</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>EmpateLive</h1>
+        <p class="subtitulo">Panel de control del servidor</p>
+      </header>
+
+      <section class="estado-grande" id="bloque-estado">
+        <p class="etiqueta">Estado del servidor</p>
+        <p class="valor" id="texto-estado">Comprobando…</p>
+      </section>
+
+      <button id="boton-principal" class="boton-principal" disabled>Comprobando…</button>
+      <p class="mensaje-error" id="mensaje-error"></p>
+
+      <section class="semaforos">
+        <div class="semaforo" id="semaforo-tunel">
+          <span class="punto"></span>
+          <span class="texto-semaforo">
+            <strong>Túnel</strong>
+            <span id="texto-tunel">—</span>
+          </span>
+        </div>
+        <div class="semaforo" id="semaforo-transmitiendo">
+          <span class="punto"></span>
+          <span class="texto-semaforo">
+            <strong>Corredores transmitiendo</strong>
+            <span id="texto-transmitiendo">—</span>
+          </span>
+        </div>
+        <div class="semaforo" id="semaforo-incidencias">
+          <span class="punto"></span>
+          <span class="texto-semaforo">
+            <strong>Incidencias</strong>
+            <span id="texto-incidencias">—</span>
+          </span>
+        </div>
+      </section>
+
+      <section class="direcciones">
+        <article class="direccion">
+          <h2>Panel de administración</h2>
+          <p class="url" id="url-panel">—</p>
+          <div class="acciones">
+            <button data-copiar="url-panel">Copiar</button>
+          </div>
+          <div class="qr" id="qr-panel"></div>
+        </article>
+
+        <article class="direccion">
+          <h2>Web pública (pantalla del recinto)</h2>
+          <p class="url" id="url-web-publica">—</p>
+          <div class="acciones">
+            <button data-copiar="url-web-publica">Copiar</button>
+          </div>
+          <div class="qr" id="qr-web-publica"></div>
+        </article>
+      </section>
+    </main>
+
+    <script type="module" src="main.js"></script>
+  </body>
+</html>

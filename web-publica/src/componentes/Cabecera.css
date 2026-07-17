@@ -1,0 +1,84 @@
+/* Banner puramente visual (logo de marca): el título y el crono viven aparte,
+   justo debajo, para que no dependan de la legibilidad sobre la foto.
+   Caja de proporción fija (como el hero de empa-t.com): así la imagen nunca
+   se deforma ni queda recortada a una tira absurda en pantallas anchas —
+   crece con el ancho pero mantiene siempre la misma forma. */
+.cabecera-banner-envoltorio {
+  background: var(--azul-oscuro);
+  padding: 1.25rem 1.25rem 0;
+}
+
+.cabecera-banner {
+  max-width: 1200px;
+  margin: 0 auto;
+  aspect-ratio: 21 / 6;
+  min-height: 110px;
+  max-height: 260px;
+  border-radius: 22px;
+  background-image: linear-gradient(180deg, rgba(6, 12, 48, 0.15), rgba(6, 12, 48, 0.35)),
+    url("/cabecera.jpg");
+  background-size: cover;
+  background-position: center 35%;
+  box-shadow:
+    0 16px 40px rgba(2, 6, 30, 0.45),
+    0 2px 8px rgba(2, 6, 30, 0.3);
+}
+
+.cabecera-info {
+  background: transparent;
+  color: var(--texto);
+  padding: 1.25rem 1.5rem;
+  text-align: center;
+}
+
+.cabecera-info__prueba {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.cabecera-info__crono-envoltorio {
+  margin: 0.5rem 0 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.cronometro {
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.cabecera-info__punto-en-directo {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ef4444;
+  box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.6);
+  animation: pulso 1.8s ease-out infinite;
+}
+
+@keyframes pulso {
+  0% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.55);
+  }
+  100% {
+    box-shadow: 0 0 0 8px rgba(239, 68, 68, 0);
+  }
+}
+
+.cabecera-info__aviso-conexion {
+  margin: 0.5rem 0 0;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #f5c451;
+}
+
+@media (min-width: 640px) {
+  .cabecera-info__prueba {
+    font-size: 2rem;
+  }
+}

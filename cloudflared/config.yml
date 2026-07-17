@@ -1,0 +1,22 @@
+# Túnel Cloudflare (spec v10 Anexo D + Anexo B §2): enruta ÚNICAMENTE la API del
+# corredor. El panel, la web pública y el resto de la API de gestión NUNCA deben
+# ser alcanzables desde este hostname, aunque se filtre un token (Anexo E).
+#
+# Requiere haber creado antes un tunnel nombrado con tu propia cuenta y dominio
+# de Cloudflare (SUP-006) — ver docs/guia_tunel_cloudflare.md paso a paso.
+# `cloudflared tunnel create <nombre>` genera <TUNNEL_ID> y credentials.json;
+# sustituye los placeholders de abajo por esos valores reales.
+
+tunnel: <TUNNEL_ID>
+credentials-file: /etc/cloudflared/credentials.json
+
+ingress:
+  - hostname: <TUNNEL_HOSTNAME>
+    # Alcance idéntico al de cloudflared/nginx-verificacion.conf (Anexo B §2):
+    # login/registro de corredor, perfil propio + foto, unirse con código,
+    # estado de la inscripción, ingesta de posiciones. Nada de gestión.
+    path: ^/(auth/corredores/(registro|login)|corredores/[^/]+(/foto)?|eventos/codigo/[^/]+/unirse|inscripciones/[^/]+/estado|eventos/[^/]+/posiciones)$
+    service: http://api:8000
+  # Catch-all: cualquier otra ruta (gestión, lectura pública, /media, /salud...)
+  # responde 404 en el propio túnel, sin llegar siquiera a la API.
+  - service: http_status:404
