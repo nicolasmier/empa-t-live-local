@@ -244,6 +244,8 @@ def unirse_a_evento(
     db.commit()
 
     return UnirseSalida(
+        evento_id=evento.id,
+        inscripcion_id=inscripcion.id,
         distancia_id=inscripcion.distancia_id,
         distancia_nombre=inscripcion.distancia.nombre,
         dorsal=inscripcion.dorsal,

@@ -22,6 +22,7 @@ const qrWebPublica = document.getElementById("qr-web-publica");
 
 let estadoActual = "detenido";
 let accionEnCurso = false;
+let sondeando = false;
 
 const ETIQUETAS_ESTADO = {
   detenido: "Servidor detenido",
@@ -111,8 +112,21 @@ async function cargarDireccionesLan() {
 }
 
 async function sondear() {
-  await refrescarEstadoServidor();
-  await refrescarResumenOperativo();
+  // Sin esto, un sondeo lento (docker compose ps/up/down puede tardar
+  // segundos, sobre todo justo tras pulsar Iniciar/Detener) se solapa con el
+  // siguiente disparo del intervalo, acumulando invocaciones de `docker`
+  // concurrentes contra el mismo proyecto — lo que hace que la ventana
+  // parezca colgada hasta que Docker termina de despejar la cola. Mientras
+  // hay una acción en curso tampoco hace falta sondear: en cuanto termine,
+  // `alPulsarBotonPrincipal` ya refresca el estado directamente.
+  if (sondeando || accionEnCurso) return;
+  sondeando = true;
+  try {
+    await refrescarEstadoServidor();
+    await refrescarResumenOperativo();
+  } finally {
+    sondeando = false;
+  }
 }
 
 async function alPulsarBotonPrincipal() {

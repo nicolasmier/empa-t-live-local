@@ -33,10 +33,15 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    # `exec uvicorn` (no un simple `&&`) para que uvicorn sustituya al shell
+    # como PID 1: si no, el `sh -c` de arriba se queda como PID 1 y no
+    # reenvía el SIGTERM de `docker compose down` a uvicorn, obligando a
+    # Docker a esperar los 10s de gracia enteros y matarlo a la fuerza en
+    # cada parada (percibido como que el launcher "no responde" al detener).
     command: >
       sh -c "alembic upgrade head &&
              python -m scripts.bootstrap_admin &&
-             uvicorn app.main:app --host 0.0.0.0 --port 8000"
+             exec uvicorn app.main:app --host 0.0.0.0 --port 8000"
 
   # Panel y web pública (spec v10 §9: LAN-only, `:8080`/`:8081`). Sirven los
   # `dist/` ya compilados (`npm run build --workspace panel`/`web-publica`) —

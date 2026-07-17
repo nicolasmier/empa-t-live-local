@@ -3890,6 +3890,14 @@
       },
       "UnirseSalida": {
         "properties": {
+          "evento_id": {
+            "type": "integer",
+            "title": "Evento Id"
+          },
+          "inscripcion_id": {
+            "type": "integer",
+            "title": "Inscripcion Id"
+          },
           "distancia_id": {
             "type": "integer",
             "title": "Distancia Id"
@@ -3913,6 +3921,8 @@
         },
         "type": "object",
         "required": [
+          "evento_id",
+          "inscripcion_id",
           "distancia_id",
           "distancia_nombre",
           "dorsal",

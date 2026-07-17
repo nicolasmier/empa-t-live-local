@@ -66,6 +66,8 @@ def test_unirse_devuelve_distancia_dorsal_y_token(cliente, db_session) -> None:
     )
     assert respuesta.status_code == 200
     cuerpo = respuesta.json()
+    assert cuerpo["evento_id"] == evento_id
+    assert isinstance(cuerpo["inscripcion_id"], int)
     assert cuerpo["dorsal"] == "42"
     assert cuerpo["distancia_nombre"] == "10K"
     assert cuerpo["evento_estado"] == "publicado"

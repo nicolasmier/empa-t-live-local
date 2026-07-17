@@ -8,6 +8,23 @@
   width: 100%;
 }
 
+/* Cartel a la izquierda, patrocinadores+noticias a la derecha — mismo bloque
+   visual debajo del mapa en vez de tiras apiladas por separado. `auto-fit`
+   con un ancho mínimo hace que, si solo hay cartel o solo hay lateral, esa
+   única columna ocupe todo el ancho en vez de dejar un hueco vacío al lado. */
+.bloque-inferior__superior {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2rem;
+  align-items: start;
+}
+
+.bloque-inferior__lateral {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
 .bloque-inferior__cartel img {
   width: 100%;
   border-radius: 16px;

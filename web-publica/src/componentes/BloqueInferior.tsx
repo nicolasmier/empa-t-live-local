@@ -35,44 +35,54 @@ export function BloqueInferior({ eventoId, cartelUrl, estado }: Props) {
     a.datos.dorsal.localeCompare(b.datos.dorsal, undefined, { numeric: true }),
   );
 
+  const hayLateral = patrocinadores.length > 0 || noticias.length > 0;
+
   return (
     <section className="bloque-inferior">
-      {cartelUrl && (
-        <div className="bloque-inferior__cartel">
-          <img src={urlMedia(cartelUrl)} alt="Cartel de la carrera" />
-        </div>
-      )}
+      {(cartelUrl || hayLateral) && (
+        <div className="bloque-inferior__superior">
+          {cartelUrl && (
+            <div className="bloque-inferior__cartel">
+              <img src={urlMedia(cartelUrl)} alt="Cartel de la carrera" />
+            </div>
+          )}
 
-      {patrocinadores.length > 0 && (
-        <div className="bloque-inferior__seccion">
-          <h3>Patrocinadores</h3>
-          <div className="patrocinadores">
-            {patrocinadores.map((p) => (
-              <a
-                key={p.id}
-                href={p.enlace_url ? normalizarUrlExterna(p.enlace_url) : undefined}
-                target="_blank"
-                rel="noreferrer"
-                className="patrocinadores__item"
-              >
-                {p.logo_url ? <img src={urlMedia(p.logo_url)} alt={p.nombre} /> : p.nombre}
-              </a>
-            ))}
-          </div>
-        </div>
-      )}
+          {hayLateral && (
+            <div className="bloque-inferior__lateral">
+              {patrocinadores.length > 0 && (
+                <div className="bloque-inferior__seccion">
+                  <h3>Patrocinadores</h3>
+                  <div className="patrocinadores">
+                    {patrocinadores.map((p) => (
+                      <a
+                        key={p.id}
+                        href={p.enlace_url ? normalizarUrlExterna(p.enlace_url) : undefined}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="patrocinadores__item"
+                      >
+                        {p.logo_url ? <img src={urlMedia(p.logo_url)} alt={p.nombre} /> : p.nombre}
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
 
-      {noticias.length > 0 && (
-        <div className="bloque-inferior__seccion">
-          <h3>Noticias</h3>
-          <ul className="noticias">
-            {noticias.map((n) => (
-              <li key={n.id}>
-                <strong>{n.titulo}</strong>
-                <p>{n.contenido}</p>
-              </li>
-            ))}
-          </ul>
+              {noticias.length > 0 && (
+                <div className="bloque-inferior__seccion">
+                  <h3>Noticias</h3>
+                  <ul className="noticias">
+                    {noticias.map((n) => (
+                      <li key={n.id}>
+                        <strong>{n.titulo}</strong>
+                        <p>{n.contenido}</p>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       )}
 

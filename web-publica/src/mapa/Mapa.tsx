@@ -43,6 +43,40 @@ function calcularProporcion(bbox: BBox): number {
   return Math.min(2.4, Math.max(0.6, anchoGrados / altoGrados));
 }
 
+// Límite de alejamiento (no de acercamiento): el uso real en carrera es
+// acercar donde se acumulan corredores, no alejar más allá del recorrido.
+const MARGEN_MAXIMO_ALEJAMIENTO_M = 500;
+const METROS_POR_GRADO_LAT = 111_320;
+
+function expandirBboxMetros(bbox: BBox, metros: number): BBox {
+  const latMedia = (bbox.norte + bbox.sur) / 2;
+  const metrosPorGradoLon = METROS_POR_GRADO_LAT * Math.cos((latMedia * Math.PI) / 180);
+  const deltaLat = metros / METROS_POR_GRADO_LAT;
+  const deltaLon = metros / metrosPorGradoLon;
+  return {
+    norte: bbox.norte + deltaLat,
+    sur: bbox.sur - deltaLat,
+    este: bbox.este + deltaLon,
+    oeste: bbox.oeste - deltaLon,
+  };
+}
+
+function bboxALimites(bbox: BBox): L.LatLngBounds {
+  return L.latLngBounds([bbox.sur, bbox.oeste], [bbox.norte, bbox.este]);
+}
+
+// Fija cuánto se puede alejar el mapa (máximo `MARGEN_MAXIMO_ALEJAMIENTO_M`
+// más allá del punto más lejano del recorrido): `setMaxBounds` limita el
+// desplazamiento y `minZoom` (calculado con el tamaño real del contenedor)
+// impide alejar más allá de ese límite. No restringe acercar, que es el uso
+// real (ver muchos corredores agrupados en un punto).
+function limitarAlejamiento(mapa: L.Map, bbox: BBox): L.LatLngBounds {
+  const limitesExpandidos = bboxALimites(expandirBboxMetros(bbox, MARGEN_MAXIMO_ALEJAMIENTO_M));
+  mapa.setMaxBounds(limitesExpandidos);
+  mapa.setMinZoom(mapa.getBoundsZoom(limitesExpandidos, false));
+  return limitesExpandidos;
+}
+
 export function Mapa({
   estado,
   gpxUrl,
@@ -55,12 +89,17 @@ export function Mapa({
   const marcadoresRef = useRef<Map<number, L.Marker>>(new Map());
   const claveIconoRef = useRef<Map<number, string>>(new Map());
   const animacionesRef = useRef<Map<number, AnimacionActiva>>(new Map());
+  const limitesExpandidosRef = useRef<L.LatLngBounds | null>(null);
 
   // Inicializa el mapa una sola vez por montaje (App.tsx remonta con `key`
   // al cambiar de distancia, así que cada pestaña tiene su propio mapa limpio).
   useEffect(() => {
     if (!contenedorRef.current || mapaRef.current) return;
-    const mapa = L.map(contenedorRef.current, { zoomControl: true, attributionControl: true });
+    const mapa = L.map(contenedorRef.current, {
+      zoomControl: true,
+      attributionControl: true,
+      maxBoundsViscosity: 1.0,
+    });
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       attribution: "© OpenStreetMap",
       maxZoom: 19,
@@ -70,8 +109,15 @@ export function Mapa({
 
     // La proporción del contenedor cambia con el bbox (ver más abajo), lo que
     // Leaflet no detecta solo: sin este observer, el mapa queda recortado o
-    // con huecos en gris hasta el siguiente resize manual de la ventana.
-    const observador = new ResizeObserver(() => mapa.invalidateSize());
+    // con huecos en gris hasta el siguiente resize manual de la ventana. El
+    // zoom mínimo también depende del tamaño del contenedor en píxeles, así
+    // que se recalcula aquí también.
+    const observador = new ResizeObserver(() => {
+      mapa.invalidateSize();
+      if (limitesExpandidosRef.current) {
+        mapa.setMinZoom(mapa.getBoundsZoom(limitesExpandidosRef.current, false));
+      }
+    });
     observador.observe(contenedorRef.current);
 
     return () => {
@@ -89,13 +135,8 @@ export function Mapa({
     if (!mapa || !bbox || !contenedorRef.current) return;
     contenedorRef.current.style.aspectRatio = String(calcularProporcion(bbox));
     mapa.invalidateSize();
-    mapa.fitBounds(
-      [
-        [bbox.sur, bbox.oeste],
-        [bbox.norte, bbox.este],
-      ],
-      { padding: [12, 12] },
-    );
+    mapa.fitBounds(bboxALimites(bbox), { padding: [12, 12] });
+    limitesExpandidosRef.current = limitarAlejamiento(mapa, bbox);
   }, [bbox]);
 
   // Trazado del GPX en rojo (spec v10 RF-012).
@@ -119,18 +160,18 @@ export function Mapa({
           // Igual que el efecto de bbox: sin un bbox precalculado (GPX sin
           // reprocesar), se calcula la proporción a partir del propio trazado.
           const limites = capa.getBounds();
+          const bboxTrazado: BBox = {
+            norte: limites.getNorth(),
+            sur: limites.getSouth(),
+            este: limites.getEast(),
+            oeste: limites.getWest(),
+          };
           if (contenedorRef.current) {
-            contenedorRef.current.style.aspectRatio = String(
-              calcularProporcion({
-                norte: limites.getNorth(),
-                sur: limites.getSouth(),
-                este: limites.getEast(),
-                oeste: limites.getWest(),
-              }),
-            );
+            contenedorRef.current.style.aspectRatio = String(calcularProporcion(bboxTrazado));
             mapa.invalidateSize();
           }
           mapa.fitBounds(limites, { padding: [12, 12] });
+          limitesExpandidosRef.current = limitarAlejamiento(mapa, bboxTrazado);
         }
       })
       .catch(() => {

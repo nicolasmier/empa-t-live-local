@@ -1,0 +1,54 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Sin permiso de galería: el selector de fotos del sistema
+         (PickVisualMedia, ActivityResultContracts) no lo necesita. -->
+
+    <!-- A2: ubicación en segundo plano. Deliberadamente SIN
+         ACCESS_BACKGROUND_LOCATION: ese permiso especial (con su propio
+         diálogo "Permitir todo el tiempo") solo hace falta para acceder a
+         la ubicación cuando la app YA NO tiene ningún foreground service
+         activo. Aquí la transmisión siempre corre dentro de un foreground
+         service con notificación visible (LocationTrackingService), así
+         que la ubicación normal de primer plano/servicio basta — menos
+         fricción de permisos para el corredor. -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <application
+        android:allowBackup="false"
+        android:icon="@android:drawable/sym_def_app_icon"
+        android:label="@string/app_name"
+        android:theme="@style/Theme.EmpateLiveCorredor"
+        android:usesCleartextTraffic="true">
+
+        <!-- usesCleartextTraffic: solo mientras se prueba contra
+             http://10.0.2.2:8000 (docker-compose.dev.yml, sin TLS) en el
+             emulador. El túnel real de producción (spec Anexo D) sí usa
+             HTTPS — revisar antes de cualquier build de release. -->
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:theme="@style/Theme.EmpateLiveCorredor">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- stopWithTask="true": si el corredor cierra la app (swipe en
+             recientes), el servicio se para con ella — spec §5: "si cierra
+             la app, deja de transmitir hasta reabrirla". Nunca intentar
+             resucitarlo a escondidas (nada de START_STICKY ni WorkManager
+             de reinicio). -->
+        <service
+            android:name=".ubicacion.LocationTrackingService"
+            android:exported="false"
+            android:foregroundServiceType="location"
+            android:stopWithTask="true" />
+    </application>
+</manifest>

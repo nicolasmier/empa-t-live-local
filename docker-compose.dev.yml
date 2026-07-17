@@ -29,10 +29,12 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    # `exec uvicorn` para que sea PID 1 y reciba el SIGTERM de `docker compose
+    # down` directamente (ver el mismo comentario en docker-compose.prod.yml).
     command: >
       sh -c "alembic upgrade head &&
              python -m seed.seed &&
-             uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+             exec uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
 
   # Simula el ingress del túnel (cloudflared/nginx-verificacion.conf) para probar
   # la restricción de superficie sin necesitar una cuenta real de Cloudflare
