@@ -93,6 +93,18 @@ fun UnirseScreen(contenedor: AppContainer) {
             label = { Text("Código de la carrera") },
             modifier = Modifier.fillMaxWidth(),
         )
+        OutlinedTextField(
+            value = vm.dorsalIntroducido,
+            onValueChange = { vm.dorsalIntroducido = it },
+            label = { Text("Tu dorsal") },
+            modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+        )
+        Text(
+            "El dorsal que te dio el organizador — confirma que la carrera te " +
+                "reconoce a ti y no a otro corredor.",
+            style = MaterialTheme.typography.bodySmall,
+            modifier = Modifier.padding(top = 2.dp),
+        )
 
         vm.error?.let {
             Text(

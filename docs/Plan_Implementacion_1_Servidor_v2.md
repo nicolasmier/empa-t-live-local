@@ -35,10 +35,10 @@ API REST + PostgreSQL + Docker + launcher gráfico + túnel + backups + simulado
 **Aceptación**: máquina de estados 100% testada; tests de permisos (Operador no escribe, corredor no accede a gestión); auditoría completa.
 
 # FASE S3 — Importación, contenidos y flujo del corredor
-1. Importación Excel → corredores + inscripciones (matching por email), **idempotente** (reimportar no duplica) y con informe por fila (creados/actualizados/errores con motivo).
+1. Importación Excel → corredores + inscripciones (matching por email o teléfono, alternativos desde 2026-07-19), **idempotente** (reimportar no duplica) y con informe por fila (creados/actualizados/errores con motivo).
 2. Subida y validación de GPX (rechazo de corruptos con mensaje claro; extracción de bounding box a `mapa_config`).
 3. CRUD de patrocinadores, noticias, cartel.
-4. `POST /eventos/codigo/{codigo}/unirse`: busca inscripción del corredor autenticado; entrega token de dispositivo; permitido solo en Publicado/Preparación/En directo; error claro si no hay inscripción. Debe soportar sin degradarse el patrón real de uso: **300–800 corredores uniéndose en la hora previa a la salida** (spec §5, ventana operativa).
+4. `POST /eventos/codigo/{codigo}/unirse`: body `{dorsal}`; busca inscripción del corredor autenticado cuyo dorsal coincida (confirmación añadida 2026-07-19); entrega token de dispositivo; permitido solo en Publicado/Preparación/En directo; error claro si no hay inscripción o si el dorsal no coincide. Debe soportar sin degradarse el patrón real de uso: **300–800 corredores uniéndose en la hora previa a la salida** (spec §5, ventana operativa).
 5. **Perfil y foto (v10)**: `PUT /corredores/{id}` (nombre, apellidos, club) y `POST /corredores/{id}/foto` — multipart, solo JPEG/PNG, límite 5 MB, validación del tipo real del fichero (no solo extensión), redimensionado a máx. 512×512, guardado en volumen local, actualización de `foto_url`. La imagen se sirve en la LAN (la consumirá la web pública).
 
 **Aceptación**: Excel de 800 filas con errores a propósito → informe correcto y sin duplicados al reimportar; corredor seedado se une, recibe token y sube foto que queda accesible por URL en la LAN.

@@ -62,7 +62,9 @@ def test_unirse_devuelve_distancia_dorsal_y_token(cliente, db_session) -> None:
     token_corredor = _login_corredor(cliente, email)
 
     respuesta = cliente.post(
-        f"/eventos/codigo/{codigo}/unirse", headers={"Authorization": f"Bearer {token_corredor}"}
+        f"/eventos/codigo/{codigo}/unirse",
+        json={"dorsal": "42"},
+        headers={"Authorization": f"Bearer {token_corredor}"},
     )
     assert respuesta.status_code == 200
     cuerpo = respuesta.json()
@@ -81,8 +83,12 @@ def test_unirse_dos_veces_revoca_token_anterior(cliente, db_session) -> None:
     token_corredor = _login_corredor(cliente, email)
     cabeceras = {"Authorization": f"Bearer {token_corredor}"}
 
-    primera = cliente.post(f"/eventos/codigo/{codigo}/unirse", headers=cabeceras)
-    segunda = cliente.post(f"/eventos/codigo/{codigo}/unirse", headers=cabeceras)
+    primera = cliente.post(
+        f"/eventos/codigo/{codigo}/unirse", json={"dorsal": "42"}, headers=cabeceras
+    )
+    segunda = cliente.post(
+        f"/eventos/codigo/{codigo}/unirse", json={"dorsal": "42"}, headers=cabeceras
+    )
     assert primera.json()["token_dispositivo"] != segunda.json()["token_dispositivo"]
 
     from app.models import TokenDispositivo
@@ -109,7 +115,9 @@ def test_unirse_evento_en_borrador_devuelve_409(cliente, db_session) -> None:
     token_corredor = _login_corredor(cliente, email)
 
     respuesta = cliente.post(
-        f"/eventos/codigo/{codigo}/unirse", headers={"Authorization": f"Bearer {token_corredor}"}
+        f"/eventos/codigo/{codigo}/unirse",
+        json={"dorsal": "42"},
+        headers={"Authorization": f"Bearer {token_corredor}"},
     )
     assert respuesta.status_code == 409
     assert respuesta.json()["error"]["code"] == "estado_no_permite_union"
@@ -132,7 +140,24 @@ def test_unirse_sin_inscripcion_devuelve_404(cliente, db_session) -> None:
     token_corredor = registro.json()["access_token"]
 
     respuesta = cliente.post(
-        f"/eventos/codigo/{codigo}/unirse", headers={"Authorization": f"Bearer {token_corredor}"}
+        f"/eventos/codigo/{codigo}/unirse",
+        json={"dorsal": "999"},
+        headers={"Authorization": f"Bearer {token_corredor}"},
     )
     assert respuesta.status_code == 404
     assert respuesta.json()["error"]["code"] == "sin_inscripcion"
+
+
+def test_unirse_con_dorsal_incorrecto_devuelve_409(cliente, db_session) -> None:
+    admin_token = _login_admin(cliente)
+    evento_id, codigo = _crear_evento_publicado(cliente, db_session, admin_token)
+    email = _crear_corredor_inscrito(db_session, evento_id)
+    token_corredor = _login_corredor(cliente, email)
+
+    respuesta = cliente.post(
+        f"/eventos/codigo/{codigo}/unirse",
+        json={"dorsal": "999"},
+        headers={"Authorization": f"Bearer {token_corredor}"},
+    )
+    assert respuesta.status_code == 409
+    assert respuesta.json()["error"]["code"] == "dorsal_no_coincide"

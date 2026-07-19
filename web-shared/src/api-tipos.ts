@@ -761,6 +761,8 @@ export interface components {
             fila: number;
             /** Email */
             email: string | null;
+            /** Telefono */
+            telefono?: string | null;
             /** Dorsal */
             dorsal: string | null;
             /** Estado */
@@ -988,6 +990,8 @@ export interface components {
             password: string;
             /** Club */
             club?: string | null;
+            /** Telefono */
+            telefono?: string | null;
         };
         /** ResumenOperativo */
         ResumenOperativo: {
@@ -1014,8 +1018,17 @@ export interface components {
              */
             expira_en: string;
         };
+        /** UnirseEntrada */
+        UnirseEntrada: {
+            /** Dorsal */
+            dorsal: string;
+        };
         /** UnirseSalida */
         UnirseSalida: {
+            /** Evento Id */
+            evento_id: number;
+            /** Inscripcion Id */
+            inscripcion_id: number;
             /** Distancia Id */
             distancia_id: number;
             /** Distancia Nombre */
@@ -1385,7 +1398,11 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UnirseEntrada"];
+            };
+        };
         responses: {
             /** @description Successful Response */
             200: {

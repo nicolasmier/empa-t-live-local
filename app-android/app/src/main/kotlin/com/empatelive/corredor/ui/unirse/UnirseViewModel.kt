@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.empatelive.corredor.almacenamiento.SesionSeguraStorage
 import com.empatelive.corredor.red.ApiService
 import com.empatelive.corredor.red.ResultadoApi
+import com.empatelive.corredor.red.UnirseEntrada
 import com.empatelive.corredor.red.llamarApi
 import kotlinx.coroutines.launch
 
@@ -16,6 +17,12 @@ class UnirseViewModel(
     private val sesion: SesionSeguraStorage,
 ) : ViewModel() {
     var codigo by mutableStateOf("")
+    // Confirmación de dorsal (decisión 2026-07-19): el código de evento identifica
+    // la carrera, no al corredor — pedir también el dorsal que le dio el
+    // organizador es el respaldo contra un email/teléfono mal enlazado. Nombre
+    // distinto de `dorsal` (abajo) para no chocar con el dorsal YA confirmado
+    // que se muestra tras unirse.
+    var dorsalIntroducido by mutableStateOf("")
     var cargando by mutableStateOf(false)
         private set
     var error by mutableStateOf<String?>(null)
@@ -31,14 +38,22 @@ class UnirseViewModel(
 
     fun unirse() {
         val codigoLimpio = codigo.trim().uppercase()
+        val dorsalLimpio = dorsalIntroducido.trim()
         if (codigoLimpio.isBlank()) {
             error = "Introduce el código de la carrera."
+            return
+        }
+        if (dorsalLimpio.isBlank()) {
+            error = "Introduce tu dorsal para confirmar que eres tú."
             return
         }
         viewModelScope.launch {
             cargando = true
             error = null
-            when (val resultado = llamarApi { api.unirseAEvento(codigoLimpio) }) {
+            val resultado = llamarApi {
+                api.unirseAEvento(codigoLimpio, UnirseEntrada(dorsal = dorsalLimpio))
+            }
+            when (resultado) {
                 is ResultadoApi.Ok -> {
                     sesion.guardarUnion(
                         eventoId = resultado.datos.eventoId,
@@ -61,5 +76,6 @@ class UnirseViewModel(
         dorsal = null
         distanciaNombre = null
         codigo = ""
+        dorsalIntroducido = ""
     }
 }

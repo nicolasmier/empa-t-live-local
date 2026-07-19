@@ -41,14 +41,32 @@ def registro_corredor(
 ) -> SesionSalida:
     existente = db.query(Corredor).filter_by(email=datos.email).one_or_none()
 
+    # email/telefono alternativos (decisión 2026-07-19): si el email no coincide
+    # con ninguna cuenta pero el corredor aporta el teléfono que el organizador
+    # cargó en el Excel, se activa esa cuenta pre-importada en vez de crear una
+    # nueva sin inscripción (el problema original: un email mal escrito dejaba
+    # la inscripción huérfana sin forma de recuperarla).
+    if existente is None and datos.telefono:
+        existente = db.query(Corredor).filter_by(telefono=datos.telefono).one_or_none()
+
     if existente is not None:
         if existente.password_hash is not None:
+            if existente.email == datos.email:
+                raise ErrorAPI(
+                    409, "email_duplicado", "Ya existe una cuenta de corredor con ese email."
+                )
             raise ErrorAPI(
-                409, "email_duplicado", "Ya existe una cuenta de corredor con ese email."
+                409, "telefono_duplicado", "Ya existe una cuenta de corredor con ese teléfono."
             )
         # Cuenta pre-importada desde Excel (RF-002): activarla fijando la contraseña,
-        # sin tocar nombre/apellidos/club ya cargados por el organizador.
+        # sin tocar nombre/apellidos/club ya cargados por el organizador. Si le
+        # faltaba el email (Excel solo con teléfono) o el teléfono, se rellenan
+        # con lo que trae este registro.
         existente.password_hash = hash_password(datos.password)
+        if existente.email is None:
+            existente.email = datos.email
+        if existente.telefono is None and datos.telefono:
+            existente.telefono = datos.telefono
         db.commit()
         db.refresh(existente)
         token, expira = crear_token_sesion_corredor(existente.id)
@@ -59,6 +77,7 @@ def registro_corredor(
         apellidos=datos.apellidos,
         club=datos.club,
         email=datos.email,
+        telefono=datos.telefono,
         password_hash=hash_password(datos.password),
     )
     db.add(corredor)

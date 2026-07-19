@@ -167,7 +167,8 @@ export function Corredores({ eventoId, rolAdmin }: Props) {
       {rolAdmin && distanciaId !== null && (
         <div className="formulario-tarjeta">
           <label>
-            Importar Excel (email, nombre, apellidos, dorsal; club opcional)
+            Importar Excel (nombre, apellidos, dorsal; email o teléfono — al menos
+            uno de los dos; club opcional)
             <input
               ref={inputArchivo}
               type="file"
@@ -198,6 +199,7 @@ export function Corredores({ eventoId, rolAdmin }: Props) {
                 <tr>
                   <th>Fila</th>
                   <th>Email</th>
+                  <th>Teléfono</th>
                   <th>Dorsal</th>
                   <th>Motivo</th>
                 </tr>
@@ -209,6 +211,7 @@ export function Corredores({ eventoId, rolAdmin }: Props) {
                     <tr key={f.fila}>
                       <td>{f.fila}</td>
                       <td>{f.email ?? "—"}</td>
+                      <td>{f.telefono ?? "—"}</td>
                       <td>{f.dorsal ?? "—"}</td>
                       <td className="error">{f.motivo}</td>
                     </tr>

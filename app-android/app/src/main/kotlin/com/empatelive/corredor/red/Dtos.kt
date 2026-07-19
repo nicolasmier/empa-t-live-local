@@ -3,13 +3,18 @@ package com.empatelive.corredor.red
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-/** Espejo de `api/app/schemas/auth.py` (RegistroCorredorEntrada/LoginCorredorEntrada). */
+/** Espejo de `api/app/schemas/auth.py` (RegistroCorredorEntrada/LoginCorredorEntrada).
+ * `telefono` es opcional: solo hace falta si el organizador cargó al corredor
+ * en el Excel con un email distinto (o ninguno) al que usa aquí — sirve para
+ * enlazar con esa cuenta pre-importada en vez de crear una nueva sin
+ * inscripción (decisión 2026-07-19). */
 @Serializable
 data class RegistroCorredorEntrada(
     val nombre: String,
     val apellidos: String,
     val email: String,
     val password: String,
+    val telefono: String? = null,
 )
 
 @Serializable
@@ -44,6 +49,15 @@ data class CorredorActualizar(
     val apellidos: String? = null,
     val club: String? = null,
 )
+
+/** Espejo de `UnirseEntrada` (api/app/schemas/unirse.py) — confirmación de
+ * dorsal (decisión 2026-07-19): el código de evento solo identifica la
+ * carrera, no al corredor; pedir también el dorsal que le dio el organizador
+ * es el respaldo contra un email/teléfono mal enlazado — mejor que la app lo
+ * detecte aquí a que el corredor descubra en directo que está viendo la señal
+ * equivocada. */
+@Serializable
+data class UnirseEntrada(val dorsal: String)
 
 /** Espejo de `UnirseSalida` (api/app/schemas/unirse.py). El `token_dispositivo`
  * es un token distinto al de sesión: es el que se usa luego para ingesta de

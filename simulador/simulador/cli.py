@@ -121,7 +121,12 @@ async def _unir_corredores(
             token_corredor = await cliente.registro_corredor(
                 email, "simulado1234", f"Corredor{i + 1:04d}", "Simulado"
             )
-            union = await cliente.unirse(token_corredor, cfg.codigo_evento)
+            # El dorsal debe coincidir con el que se escribió en `_excel_corredores`
+            # para este mismo corredor (1000 + posición en el Excel, 1-indexado):
+            # desde que `unirse` exige confirmación de dorsal (decisión 2026-07-19),
+            # el simulador tiene que "saberlo" igual que lo sabría un corredor real
+            # mirando su dorsal de papel.
+            union = await cliente.unirse(token_corredor, cfg.codigo_evento, str(1000 + i + 1))
             tokens[i] = union["token_dispositivo"]
 
     await asyncio.gather(*(_unir_uno(i) for i in range(cfg.corredores)))

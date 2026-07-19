@@ -544,6 +544,16 @@
             }
           }
         ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UnirseEntrada"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -3070,6 +3080,17 @@
             ],
             "title": "Email"
           },
+          "telefono": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Telefono"
+          },
           "dorsal": {
             "anyOf": [
               {
@@ -3819,6 +3840,17 @@
               }
             ],
             "title": "Club"
+          },
+          "telefono": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Telefono"
           }
         },
         "type": "object",
@@ -3887,6 +3919,19 @@
           "expira_en"
         ],
         "title": "SesionSalida"
+      },
+      "UnirseEntrada": {
+        "properties": {
+          "dorsal": {
+            "type": "string",
+            "title": "Dorsal"
+          }
+        },
+        "type": "object",
+        "required": [
+          "dorsal"
+        ],
+        "title": "UnirseEntrada"
       },
       "UnirseSalida": {
         "properties": {

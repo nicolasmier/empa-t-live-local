@@ -80,9 +80,11 @@ class ClienteAPI:
         r.raise_for_status()
         return r.json()["access_token"]
 
-    async def unirse(self, token_corredor: str, codigo_acceso: str) -> dict[str, Any]:
+    async def unirse(self, token_corredor: str, codigo_acceso: str, dorsal: str) -> dict[str, Any]:
         r = await self._cliente.post(
-            f"/eventos/codigo/{codigo_acceso}/unirse", headers=_auth(token_corredor)
+            f"/eventos/codigo/{codigo_acceso}/unirse",
+            json={"dorsal": dorsal},
+            headers=_auth(token_corredor),
         )
         r.raise_for_status()
         return r.json()

@@ -40,7 +40,10 @@ interface ApiService {
     ): Response<CorredorSalida>
 
     @POST("eventos/codigo/{codigoAcceso}/unirse")
-    suspend fun unirseAEvento(@Path("codigoAcceso") codigoAcceso: String): Response<UnirseSalida>
+    suspend fun unirseAEvento(
+        @Path("codigoAcceso") codigoAcceso: String,
+        @Body datos: UnirseEntrada,
+    ): Response<UnirseSalida>
 
     // Token de DISPOSITIVO explícito (@Header), no el de sesión que añade
     // el interceptor por defecto (ver ApiClient) — son credenciales

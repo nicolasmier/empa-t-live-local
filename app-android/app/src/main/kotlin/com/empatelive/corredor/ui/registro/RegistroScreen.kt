@@ -61,6 +61,19 @@ fun RegistroScreen(
             modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
         )
         OutlinedTextField(
+            value = vm.telefono,
+            onValueChange = { vm.telefono = it },
+            label = { Text("Teléfono (opcional)") },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+            modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+        )
+        Text(
+            "Ponlo si el organizador te cargó con un email distinto (o sin email) " +
+                "en el Excel de inscripciones — así enlazamos igualmente tu dorsal.",
+            style = MaterialTheme.typography.bodySmall,
+            modifier = Modifier.fillMaxWidth().padding(top = 2.dp),
+        )
+        OutlinedTextField(
             value = vm.password,
             onValueChange = { vm.password = it },
             label = { Text("Contraseña (mínimo 8 caracteres)") },

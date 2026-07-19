@@ -20,6 +20,8 @@
 
 > **Clarify SDD (2026-07-16)**: resueltos los 16 marcadores `[NEEDS CLARIFICATION]` bloqueantes para el servidor (Plan 1) con decisiones del responsable — máquina de estados (ingesta fuera de En directo, retroceso Finalizado→En directo), intervalos GPS por defecto, importación (dorsal duplicado, formato del Excel, email existente), foto (5 MB, lado máx. 512 px), ingesta (umbrales `directo`/`sospechoso`, lote máximo, evento≠token), sesiones, login, tokens de dispositivo y hash de contraseñas (argon2id). Quedan abiertos los marcadores **no bloqueantes** (favoritos, NTP, objetivos de CE-005/006/007, retención, catálogo de `tipo` de incidencia, licencia de Docker Desktop, Electron vs. Tauri).
 
+> **Decisión de producto (2026-07-19)**: el matching Excel↔cuenta de corredor dependía en exclusiva del `email`, sin ningún camino de recuperación si el corredor se registraba con un email distinto (o mal escrito) al que cargó el organizador — la inscripción quedaba huérfana ("no se ha encontrado tu inscripción"). Dos cambios para cerrar ese hueco: **(1)** el Excel de importación acepta `email` y `telefono` como identificadores alternativos (al menos uno obligatorio por fila; ver Anexo A y B §4), y el registro en la app admite un teléfono opcional para el mismo fin; **(2)** `POST /eventos/codigo/{codigo}/unirse` exige que el corredor confirme también su **dorsal** al introducir el código (Anexo B §5, EA-015) — un respaldo barato contra cualquier enlace incorrecto que, si no se detecta antes de la carrera, se traduce en la app mostrando o transmitiendo la señal de otro corredor.
+
 ---
 
 # PARTE I — ESPECIFICACIÓN DE REQUISITOS (SRS)
@@ -82,6 +84,7 @@ Un evento tiene un `codigo_acceso` único (alias legible, p. ej. `MADRID2026`) y
 - **EA-010** — *Ingesta fuera de En directo*: dado un evento que no está En directo, cuando llega un envío de posiciones, entonces se rechaza con error claro (HTTP `409`) sin almacenarse (sección 11).
 - **EA-011** — *Dorsal duplicado en importación*: dado un Excel con un dorsal repetido dentro de la misma distancia, cuando se importa, entonces la restricción `UNIQUE (distancia_id, dorsal)` impide esa fila; se **importan las filas válidas y se devuelve un informe fila a fila** con los conflictos (decisión clarify 2026-07-16; coherente con el informe de importación por fila del plan W3). La importación es idempotente.
 - **EA-012** — *Corredor sin inscripción*: dado un corredor autenticado sin inscripción en el evento, cuando introduce el código, entonces recibe el error claro "no se ha encontrado tu inscripción; contacta con el organizador" (Anexo B §5).
+- **EA-015** — *Dorsal de confirmación no coincide*: dado un corredor autenticado con alguna inscripción en el evento, cuando introduce el código pero un dorsal que no es el suyo, entonces recibe `409 dorsal_no_coincide` sin unirse (distinto del caso EA-012, sin inscripción en absoluto — decisión 2026-07-19, Anexo B §5).
 - **EA-013** — *Foto inválida*: dado un fichero que no es JPEG/PNG (validado por su tipo real, no por la extensión) o que excede el límite de tamaño, cuando se sube como foto de perfil, entonces el servidor lo rechaza con error claro (Anexo B §5).
 - **EA-014** — *Pérdida del túnel En directo*: dado que el túnel cae durante la carrera, entonces las apps almacenan localmente y sincronizan al restablecerse; la web pública (LAN) sigue mostrando las últimas posiciones recibidas y el launcher refleja la caída en su semáforo de túnel (sección 13, Anexo C).
 
@@ -203,7 +206,7 @@ Supuestos hoy implícitos en el documento; si alguno deja de cumplirse, deben re
 - **SUP-004** — La LAN del recinto la controla el organizador (pantalla por cable HDMI o router propio del evento, nunca la wifi pública, sección 9); por eso el Anexo E acepta HTTP simple dentro de esa "LAN de confianza".
 - **SUP-005** — El reloj del servidor es fiable. [NEEDS CLARIFICATION: ¿se exige sincronización NTP del PC del Administrador? La clasificación `directo`/`sincronizado` y la marca `sospechoso` dependen de que el reloj del servidor sea correcto.]
 - **SUP-006** — El organizador dispone de un dominio propio en una cuenta gratuita de Cloudflare, configurado una sola vez antes del primer evento (Anexo D).
-- **SUP-007** — Las inscripciones se importan desde Excel antes de que los corredores introduzcan el código; el matching corredor–inscripción se hace por email, que se asume único y correcto en el Excel (Anexo B §4).
+- **SUP-007** — Las inscripciones se importan desde Excel antes de que los corredores introduzcan el código; el matching corredor–cuenta se hace por **email o teléfono** (al menos uno de los dos, decisión 2026-07-19), que se asumen únicos y correctos en el Excel (Anexo B §4). Como respaldo adicional frente a un email/teléfono mal escrito, `POST /eventos/codigo/{codigo}/unirse` exige que el corredor confirme también su dorsal (Anexo B §5).
 - **SUP-008** — Un corredor transmite desde un único dispositivo durante la carrera: unirse desde un segundo dispositivo **revoca el token anterior** (un solo token de dispositivo activo por inscripción; decisión clarify 2026-07-16). Evita señales duplicadas o contradictorias.
 - **SUP-009** — El corredor concede a la app el permiso de ubicación en segundo plano y la exclusión de optimización de batería cuando se le solicitan (RF-006).
 - **SUP-010** — Los espectadores no necesitan acceso remoto: consumen la pantalla física del recinto u otros dispositivos de la LAN (sección 3).
@@ -243,7 +246,8 @@ erDiagram
     varchar apellidos
     varchar club
     varchar foto_url
-    varchar email UK
+    varchar email UK "nullable — email o telefono, CHECK al menos uno"
+    varchar telefono UK "nullable — alternativo al email (2026-07-19)"
     varchar password_hash
     timestamptz creado_en
   }
@@ -395,15 +399,15 @@ La separación se implementa a nivel de reverse proxy/túnel (el túnel solo enr
 | POST | `/eventos/{id}/estado` | Valida transición (sección 11); `409` si inválida | Admin |
 | GET/POST | `/eventos/{id}/distancias` · PUT `/distancias/{id}` | | Admin |
 | POST | `/distancias/{id}/gpx` | multipart | Admin |
-| POST | `/distancias/{id}/corredores/importar` | Excel → corredores + inscripciones (matching por email) | Admin |
+| POST | `/distancias/{id}/corredores/importar` | Excel → corredores + inscripciones (matching por email o teléfono) | Admin |
 | GET/POST/PUT | `/eventos/{id}/patrocinadores` · `/noticias` | | Admin (lectura LAN abierta) |
 | GET | `/eventos/{id}/incidencias` · PUT `/incidencias/{id}/resolver` | | Admin/Operador |
 | GET | `/auditoria?evento_id=&desde=&hasta=` | | Admin |
 
-**Formato del Excel de importación** (decisión clarify 2026-07-16): columnas obligatorias `email`, `nombre`, `apellidos`, `dorsal`; columna opcional `club`. La distancia se toma de la ruta (`/distancias/{id}/corredores/importar`), no de una columna. Si el `email` ya existe como cuenta de corredor registrada, **se vincula la inscripción a la cuenta existente sin modificar su perfil** (matching idempotente por email); si no existe, se crea la cuenta. La foto no se importa por Excel: la sube el corredor desde la app.
+**Formato del Excel de importación** (decisión clarify 2026-07-16, ampliada 2026-07-19): columnas obligatorias `nombre`, `apellidos`, `dorsal`; `email` y `telefono` son **alternativos** — la cabecera debe traer al menos una de las dos, y cada fila debe rellenar al menos una (motivo: un email mal escrito en el Excel dejaba la inscripción huérfana sin forma de recuperarla; con las dos vías, si una falla la otra sigue sirviendo para el matching); columna `club` opcional. La distancia se toma de la ruta (`/distancias/{id}/corredores/importar`), no de una columna. El matching es por email si coincide, si no por teléfono: si alguno de los dos ya existe en una cuenta de corredor registrada, **se vincula la inscripción a la cuenta existente sin modificar nombre/apellidos/club**, aunque sí se rellena el email o teléfono que le faltara; si no existe ninguna coincidencia, se crea la cuenta (pre-importada, sin contraseña — el `email` puede quedar vacío si el Excel solo traía teléfono, ver Anexo A). La foto no se importa por Excel: la sube el corredor desde la app.
 
 ### 5. Endpoints del corredor (túnel)
-- `POST /eventos/codigo/{codigo_acceso}/unirse` — busca la inscripción del corredor autenticado en ese evento; si existe, devuelve distancia, dorsal y **token de dispositivo**; si no, error claro ("no se ha encontrado tu inscripción; contacta con el organizador"). Permitido en Publicado/Preparación/En directo.
+- `POST /eventos/codigo/{codigo_acceso}/unirse` — body: `{ dorsal }`. Busca la inscripción del corredor autenticado en ese evento **cuyo dorsal coincida con el enviado**; si existe, devuelve distancia, dorsal y **token de dispositivo**; si el corredor no tiene ninguna inscripción en el evento, error claro ("no se ha encontrado tu inscripción; contacta con el organizador", `404 sin_inscripcion`); si tiene inscripción pero el dorsal no coincide, `409 dorsal_no_coincide` (decisión 2026-07-19: el código de evento solo identifica la carrera, no al corredor — confirmar el dorsal es el respaldo contra un email/teléfono mal enlazado en la importación). Permitido en Publicado/Preparación/En directo.
 - `GET/PUT /corredores/{id}` — perfil propio (nombre, apellidos, club).
 - `POST /corredores/{id}/foto` — subida de foto de perfil (multipart; solo JPEG/PNG, **límite normativo 5 MB**; foto mayor → error claro). El servidor valida el tipo real del fichero, la redimensiona escalando el **lado mayor a 512 px máx. preservando la relación de aspecto** (sin recorte), la guarda en un volumen local y actualiza `foto_url`; la web pública la sirve desde la LAN. (Valores fijados en clarify 2026-07-16.)
 - `GET /inscripciones/{id}/estado` — para la pantalla de estado de la app. Devuelve (decisión clarify 2026-07-16): `dorsal`, nombre de la distancia, `estado_transmision` calculado (`transmitiendo`/`sin_senal`, comparando la última posición con `umbral_sin_senal_seg`), `latitud`/`longitud` y `timestamp_dispositivo` de la última posición conocida, `timestamp_recepcion`, `bateria_pct` del último punto y `estado` del evento.
@@ -438,7 +442,7 @@ Login → listado de eventos → edición por pestañas: General (nombre, fecha,
 Cabecera (logo, prueba, crono) → filtros (dorsal, todos, ★ favoritos) → mapa por distancia (pestañas si hay varias; GPX rojo, bolitas con dorsal, interpolación suave) → ficha modal al pulsar corredor (foto, nombre, apellidos, club, sin tapar el mapa) → cartel, info, patrocinadores, listado.
 
 ### App Android
-Login/registro (una vez) → unirse con código → pantalla de estado (dorsal, GPS, batería, conexión) → perfil editable (nombre, apellidos, club y subida de foto).
+Login/registro (una vez; el registro admite un teléfono opcional para enlazar con una cuenta pre-importada si el email no coincide con el del Excel) → unirse con código **y confirmación del propio dorsal** → pantalla de estado (dorsal, GPS, batería, conexión) → perfil editable (nombre, apellidos, club y subida de foto).
 
 ### Semántica de color
 Verde = transmitiendo · Ámbar/gris = sin señal (+hora de última posición). El rojo queda reservado para el futuro SOS (v1.1). `colores_config` personaliza la paleta, pero se conserva la asociación semántica.

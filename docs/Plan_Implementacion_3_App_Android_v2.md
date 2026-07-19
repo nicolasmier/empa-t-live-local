@@ -14,7 +14,7 @@ App Android nativa (Kotlin sugerido). Sin SOS en v1.0 (pospuesto a v1.1 por deci
 # FASE A1 — Cuenta, perfil y unión al evento
 1. Registro/login de corredor contra `/auth/corredores/*`; sesión persistente (cuenta permanente, no se pide login en cada uso).
 2. Perfil: nombre, apellidos, club (`PUT /corredores/{id}`) y **foto** (`POST /corredores/{id}/foto`): selección de galería o cámara, recorte/compresión en el dispositivo antes de subir (JPEG, respetando el límite de 5 MB de la API — no delegar en el servidor el rechazo de fotos de 40 MB de cámara moderna).
-3. Unirse al evento: campo de código de carrera → `POST /eventos/codigo/{codigo}/unirse` → guardar distancia, dorsal y **token de dispositivo en almacenamiento seguro** (EncryptedSharedPreferences/Keystore). Manejar con mensaje claro el error "no se ha encontrado tu inscripción".
+3. Unirse al evento: campo de código de carrera + confirmación del propio dorsal (decisión 2026-07-19, respaldo contra un email/teléfono mal enlazado) → `POST /eventos/codigo/{codigo}/unirse` → guardar distancia, dorsal y **token de dispositivo en almacenamiento seguro** (EncryptedSharedPreferences/Keystore). Manejar con mensaje claro tanto "no se ha encontrado tu inscripción" (404) como "el dorsal no coincide" (409).
 4. Contexto de uso real a tener en cuenta en la UX de esta pantalla: la mayoría de corredores harán registro + código **en la hora previa a la salida** (spec §5), en la calle, con prisa y quizá mala cobertura — el flujo completo debe poder completarse en menos de 2 minutos y tolerar reintentos.
 
 **Aceptación**: flujo completo registro → perfil con foto → código → dorsal en pantalla, en menos de 2 min contra el entorno de desarrollo; el token sobrevive a cerrar y reabrir la app.

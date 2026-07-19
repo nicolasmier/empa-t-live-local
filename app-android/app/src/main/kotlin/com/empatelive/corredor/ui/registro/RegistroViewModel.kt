@@ -20,6 +20,7 @@ class RegistroViewModel(
     var nombre by mutableStateOf("")
     var apellidos by mutableStateOf("")
     var email by mutableStateOf("")
+    var telefono by mutableStateOf("")
     var password by mutableStateOf("")
     var cargando by mutableStateOf(false)
     var error by mutableStateOf<String?>(null)
@@ -44,6 +45,7 @@ class RegistroViewModel(
                         apellidos = apellidos.trim(),
                         email = email.trim(),
                         password = password,
+                        telefono = telefono.trim().ifBlank { null },
                     ),
                 )
             }

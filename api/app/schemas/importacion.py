@@ -4,6 +4,7 @@ from pydantic import BaseModel
 class ImportacionFila(BaseModel):
     fila: int
     email: str | None
+    telefono: str | None = None
     dorsal: str | None
     estado: str  # "creado" | "actualizado" | "sin_cambios" | "error"
     motivo: str | None = None

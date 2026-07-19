@@ -8,7 +8,7 @@ from app.dominio.estados_evento import transicion_valida
 from app.errores import ErrorAPI
 from app.models import Corredor, Distancia, Evento, Inscripcion, TokenDispositivo, Usuario
 from app.schemas.eventos import CambioEstadoEntrada, EventoActualizar, EventoCrear, EventoSalida
-from app.schemas.unirse import UnirseSalida
+from app.schemas.unirse import UnirseEntrada, UnirseSalida
 from app.security.dependencies import obtener_corredor_actual, requiere_admin, requiere_panel
 from app.security.tokens import generar_token_dispositivo, hash_token_dispositivo
 from app.servicios.auditoria import registrar_auditoria
@@ -201,6 +201,7 @@ def cambiar_estado_evento(
 @router.post("/codigo/{codigo_acceso}/unirse", response_model=UnirseSalida)
 def unirse_a_evento(
     codigo_acceso: str,
+    datos: UnirseEntrada,
     db: Session = Depends(get_db),
     corredor: Corredor = Depends(obtener_corredor_actual),
 ) -> UnirseSalida:
@@ -217,15 +218,36 @@ def unirse_a_evento(
     inscripcion = (
         db.query(Inscripcion)
         .join(Distancia)
-        .filter(Distancia.evento_id == evento.id, Inscripcion.corredor_id == corredor.id)
+        .filter(
+            Distancia.evento_id == evento.id,
+            Inscripcion.corredor_id == corredor.id,
+            Inscripcion.dorsal == datos.dorsal,
+        )
         .order_by(Inscripcion.id)
         .first()
     )
     if inscripcion is None:
+        # Dos causas distintas de fallo, dos mensajes distintos: si el corredor
+        # tiene alguna inscripción en este evento pero el dorsal no coincide, es
+        # un error de tecleo (o un dato mal cargado) — no lo mismo que no tener
+        # ninguna inscripción en absoluto.
+        tiene_alguna = (
+            db.query(Inscripcion)
+            .join(Distancia)
+            .filter(Distancia.evento_id == evento.id, Inscripcion.corredor_id == corredor.id)
+            .first()
+        )
+        if tiene_alguna is None:
+            raise ErrorAPI(
+                404,
+                "sin_inscripcion",
+                "No se ha encontrado tu inscripción; contacta con el organizador.",
+            )
         raise ErrorAPI(
-            404,
-            "sin_inscripcion",
-            "No se ha encontrado tu inscripción; contacta con el organizador.",
+            409,
+            "dorsal_no_coincide",
+            "El dorsal introducido no coincide con tu inscripción; revísalo o "
+            "contacta con el organizador.",
         )
 
     # Un solo token de dispositivo activo por inscripción (SUP-008): unirse desde un
