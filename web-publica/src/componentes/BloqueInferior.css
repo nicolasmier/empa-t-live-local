@@ -78,6 +78,41 @@
   color: var(--texto-suave);
 }
 
+/* Lista de corredores plegable: no ocupa espacio hasta que se abre. */
+.listado-desplegable__resumen {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  user-select: none;
+}
+
+/* Oculta el triángulo nativo (incluido el de Safari/WebKit) para poner el
+   nuestro con ::after. */
+.listado-desplegable__resumen::-webkit-details-marker {
+  display: none;
+}
+
+.listado-desplegable__resumen h3 {
+  margin: 0;
+}
+
+.listado-desplegable__resumen::after {
+  content: "▾";
+  color: var(--texto-suave);
+  font-size: 0.9rem;
+  transition: transform 0.15s ease;
+}
+
+.listado-desplegable[open] .listado-desplegable__resumen::after {
+  transform: rotate(180deg);
+}
+
+.listado-desplegable[open] .listado-desplegable__resumen {
+  margin-bottom: 0.75rem;
+}
+
 .listado {
   width: 100%;
   border-collapse: collapse;

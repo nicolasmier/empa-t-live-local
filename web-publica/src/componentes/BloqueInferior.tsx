@@ -49,6 +49,20 @@ export function BloqueInferior({ eventoId, cartelUrl, estado }: Props) {
 
           {hayLateral && (
             <div className="bloque-inferior__lateral">
+              {noticias.length > 0 && (
+                <div className="bloque-inferior__seccion">
+                  <h3>Noticias</h3>
+                  <ul className="noticias">
+                    {noticias.map((n) => (
+                      <li key={n.id}>
+                        <strong>{n.titulo}</strong>
+                        <p>{n.contenido}</p>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
               {patrocinadores.length > 0 && (
                 <div className="bloque-inferior__seccion">
                   <h3>Patrocinadores</h3>
@@ -67,27 +81,15 @@ export function BloqueInferior({ eventoId, cartelUrl, estado }: Props) {
                   </div>
                 </div>
               )}
-
-              {noticias.length > 0 && (
-                <div className="bloque-inferior__seccion">
-                  <h3>Noticias</h3>
-                  <ul className="noticias">
-                    {noticias.map((n) => (
-                      <li key={n.id}>
-                        <strong>{n.titulo}</strong>
-                        <p>{n.contenido}</p>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
             </div>
           )}
         </div>
       )}
 
-      <div className="bloque-inferior__seccion">
-        <h3>Corredores ({corredores.length})</h3>
+      <details className="bloque-inferior__seccion listado-desplegable">
+        <summary className="listado-desplegable__resumen">
+          <h3>Corredores ({corredores.length})</h3>
+        </summary>
         <table className="listado">
           <thead>
             <tr>
@@ -119,7 +121,7 @@ export function BloqueInferior({ eventoId, cartelUrl, estado }: Props) {
             ))}
           </tbody>
         </table>
-      </div>
+      </details>
     </section>
   );
 }

@@ -11,27 +11,28 @@ interface Props {
 }
 
 // Tarjeta flotante, no un overlay a pantalla completa: la spec pide que la
-// ficha no tape el mapa (Anexo C).
+// ficha no tape el mapa (Anexo C). Se adapta a los datos disponibles del
+// corredor: la foto solo aparece si la hay (el dorsal ya se muestra en grande,
+// así que un círculo placeholder con el número sería redundante) y el nombre y
+// el club solo si vienen rellenos.
 export function FichaCorredor({ posicion, esFavorito, onCerrar, onAlternarFavorito }: Props) {
+  const nombreCompleto = [posicion.nombre, posicion.apellidos].filter(Boolean).join(" ").trim();
+
   return (
     <div className="ficha">
       <button type="button" className="ficha__cerrar" onClick={onCerrar} aria-label="Cerrar">
         <IconoCerrar />
       </button>
 
-      <div className="ficha__foto">
-        {posicion.foto_url ? (
+      {posicion.foto_url && (
+        <div className="ficha__foto">
           <img src={urlMedia(posicion.foto_url)} alt="" />
-        ) : (
-          <span>{posicion.dorsal}</span>
-        )}
-      </div>
+        </div>
+      )}
 
       <div className="ficha__datos">
         <p className="ficha__dorsal">{posicion.dorsal}</p>
-        <h2 className="ficha__nombre">
-          {posicion.nombre} {posicion.apellidos}
-        </h2>
+        {nombreCompleto && <h2 className="ficha__nombre">{nombreCompleto}</h2>}
         {posicion.club && <p className="ficha__club">{posicion.club}</p>}
       </div>
 

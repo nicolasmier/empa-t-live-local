@@ -7,52 +7,48 @@
   right: 1rem;
   bottom: 1rem;
   z-index: 1000;
-  --ficha-texto: #1f2430;
-  --ficha-texto-suave: #5b6270;
-  --ficha-borde: #e2e5ec;
-  background: #f4f6fa;
+  --ficha-texto: #1b1f28;
+  --ficha-texto-suave: #4b515d;
+  --ficha-borde: #b7bcc7;
+  background: #d2d6de;
   border: 1px solid var(--ficha-borde);
-  border-radius: 16px;
-  box-shadow: 0 8px 28px rgba(15, 22, 45, 0.28);
-  padding: 1.25rem 1.5rem 1.5rem;
-  width: min(320px, calc(100vw - 2rem));
+  border-radius: 14px;
+  box-shadow: 0 6px 20px rgba(15, 22, 45, 0.3);
+  padding: 0.85rem 1rem 1rem;
+  width: min(240px, calc(100vw - 2rem));
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 0.4rem;
+  gap: 0.3rem;
   color: var(--ficha-texto);
 }
 
 .ficha__cerrar {
   position: absolute;
-  top: 0.6rem;
-  right: 0.6rem;
+  top: 0.4rem;
+  right: 0.4rem;
   border: none;
   background: transparent;
   color: var(--ficha-texto-suave);
   cursor: pointer;
-  padding: 0.35rem;
+  padding: 0.3rem;
   border-radius: 999px;
   line-height: 0;
 }
 
 .ficha__cerrar:hover {
-  background: rgba(15, 22, 45, 0.08);
+  background: rgba(15, 22, 45, 0.1);
 }
 
 .ficha__foto {
-  width: 84px;
-  height: 84px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
   overflow: hidden;
-  background: var(--azul-acento);
-  color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.5rem;
-  font-weight: 700;
 }
 
 .ficha__foto img {
@@ -65,35 +61,36 @@
   margin: 0;
   color: var(--ficha-texto);
   font-weight: 800;
-  font-size: 1.6rem;
+  font-size: 1.35rem;
   line-height: 1.1;
   letter-spacing: 0.01em;
 }
 
 .ficha__nombre {
-  margin: 0.15rem 0 0;
-  font-size: 1.15rem;
+  margin: 0.1rem 0 0;
+  font-size: 0.98rem;
   color: var(--ficha-texto);
 }
 
 .ficha__club {
   margin: 0;
+  font-size: 0.85rem;
   color: var(--ficha-texto-suave);
 }
 
 .ficha__favorito {
-  margin-top: 0.5rem;
+  margin-top: 0.4rem;
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  padding: 0.4rem 0.9rem;
+  gap: 0.35rem;
+  padding: 0.32rem 0.75rem;
   border-radius: 999px;
   border: 1px solid var(--ficha-borde);
-  background: #ffffff;
+  background: #eef0f4;
   color: var(--ficha-texto-suave);
   font: inherit;
   font-weight: 600;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   cursor: pointer;
 }
 
