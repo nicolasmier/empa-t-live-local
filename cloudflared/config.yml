@@ -7,11 +7,11 @@
 # `cloudflared tunnel create <nombre>` genera <TUNNEL_ID> y credentials.json;
 # sustituye los placeholders de abajo por esos valores reales.
 
-tunnel: <TUNNEL_ID>
+tunnel: a5057d96-2cd2-4936-88be-ff654759f19a
 credentials-file: /etc/cloudflared/credentials.json
 
 ingress:
-  - hostname: <TUNNEL_HOSTNAME>
+  - hostname: api.observeweb.com
     # Alcance idéntico al de cloudflared/nginx-verificacion.conf (Anexo B §2):
     # login/registro de corredor, perfil propio + foto, unirse con código,
     # estado de la inscripción, ingesta de posiciones. Nada de gestión.
