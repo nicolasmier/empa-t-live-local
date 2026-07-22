@@ -28,7 +28,7 @@ export function FichaCorredor({ posicion, esFavorito, onCerrar, onAlternarFavori
       </div>
 
       <div className="ficha__datos">
-        <p className="ficha__dorsal">Dorsal {posicion.dorsal}</p>
+        <p className="ficha__dorsal">{posicion.dorsal}</p>
         <h2 className="ficha__nombre">
           {posicion.nombre} {posicion.apellidos}
         </h2>

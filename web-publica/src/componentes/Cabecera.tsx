@@ -2,13 +2,13 @@ import { Cronometro } from "./Cronometro";
 import "./Cabecera.css";
 
 interface Props {
-  eventoId: number;
   nombreEvento: string;
   enDirecto: boolean;
+  inicioDirecto: string | null;
   conectado: boolean;
 }
 
-export function Cabecera({ eventoId, nombreEvento, enDirecto, conectado }: Props) {
+export function Cabecera({ nombreEvento, enDirecto, inicioDirecto, conectado }: Props) {
   return (
     <>
       <div className="cabecera-banner-envoltorio">
@@ -19,7 +19,7 @@ export function Cabecera({ eventoId, nombreEvento, enDirecto, conectado }: Props
         {enDirecto && (
           <p className="cabecera-info__crono-envoltorio">
             <span className="cabecera-info__punto-en-directo" />
-            <Cronometro eventoId={eventoId} enDirecto={enDirecto} />
+            <Cronometro enDirecto={enDirecto} inicioDirecto={inicioDirecto} />
           </p>
         )}
         {!conectado && (

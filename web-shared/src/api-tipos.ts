@@ -378,6 +378,28 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/distancias/{distancia_id}/corredores": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Crear Corredor
+         * @description Alta individual (misma lógica que la importación de Excel, pero de uno en
+         *     uno): matching por email y, si no, por teléfono; comprobación de dorsal
+         *     duplicado antes de crear nada.
+         */
+        post: operations["crear_corredor_distancias__distancia_id__corredores_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/distancias/{distancia_id}/corredores/{inscripcion_id}": {
         parameters: {
             query?: never;
@@ -742,6 +764,8 @@ export interface components {
             cartel_url: string | null;
             /** Hora Programada Directo */
             hora_programada_directo: string | null;
+            /** Inicio Directo */
+            inicio_directo: string | null;
             /** Creado Por */
             creado_por: number;
             /**
@@ -822,6 +846,27 @@ export interface components {
             apellidos?: string | null;
             /** Club */
             club?: string | null;
+        };
+        /**
+         * InscripcionCrear
+         * @description Alta individual de un corredor en una distancia desde el panel (para los
+         *     que se quedaron sin importar por Excel o para pruebas). Mismas reglas que la
+         *     importación (Anexo B §4, decisión 2026-07-19): nombre/apellidos/dorsal
+         *     obligatorios y al menos uno de email/telefono.
+         */
+        InscripcionCrear: {
+            /** Dorsal */
+            dorsal: string;
+            /** Nombre */
+            nombre: string;
+            /** Apellidos */
+            apellidos: string;
+            /** Club */
+            club?: string | null;
+            /** Email */
+            email?: string | null;
+            /** Telefono */
+            telefono?: string | null;
         };
         /** InscripcionEstadoSalida */
         InscripcionEstadoSalida: {
@@ -2107,6 +2152,43 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["CorredorSalida"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    crear_corredor_distancias__distancia_id__corredores_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                distancia_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InscripcionCrear"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PosicionPublica"];
                 };
             };
             /** @description Validation Error */

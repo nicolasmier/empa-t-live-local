@@ -1,12 +1,19 @@
+/* Caja gris claro moderna (no el azul del resto de la web): fondo neutro con
+   texto oscuro, para que la ficha del corredor destaque sobre el mapa. Las
+   variables de color se redefinen localmente aquí para no tocar el tema azul
+   global del resto de componentes. */
 .ficha {
   position: fixed;
   right: 1rem;
   bottom: 1rem;
   z-index: 1000;
-  background: var(--azul-superficie-clara);
-  border: 1px solid var(--azul-borde);
+  --ficha-texto: #1f2430;
+  --ficha-texto-suave: #5b6270;
+  --ficha-borde: #e2e5ec;
+  background: #f4f6fa;
+  border: 1px solid var(--ficha-borde);
   border-radius: 16px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 8px 28px rgba(15, 22, 45, 0.28);
   padding: 1.25rem 1.5rem 1.5rem;
   width: min(320px, calc(100vw - 2rem));
   display: flex;
@@ -14,7 +21,7 @@
   align-items: center;
   text-align: center;
   gap: 0.4rem;
-  color: var(--texto);
+  color: var(--ficha-texto);
 }
 
 .ficha__cerrar {
@@ -23,7 +30,7 @@
   right: 0.6rem;
   border: none;
   background: transparent;
-  color: var(--texto-suave);
+  color: var(--ficha-texto-suave);
   cursor: pointer;
   padding: 0.35rem;
   border-radius: 999px;
@@ -31,7 +38,7 @@
 }
 
 .ficha__cerrar:hover {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(15, 22, 45, 0.08);
 }
 
 .ficha__foto {
@@ -56,21 +63,22 @@
 
 .ficha__dorsal {
   margin: 0;
-  color: var(--texto-suave);
-  font-weight: 600;
-  font-size: 0.85rem;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  color: var(--ficha-texto);
+  font-weight: 800;
+  font-size: 1.6rem;
+  line-height: 1.1;
+  letter-spacing: 0.01em;
 }
 
 .ficha__nombre {
   margin: 0.15rem 0 0;
   font-size: 1.15rem;
+  color: var(--ficha-texto);
 }
 
 .ficha__club {
   margin: 0;
-  color: var(--texto-suave);
+  color: var(--ficha-texto-suave);
 }
 
 .ficha__favorito {
@@ -80,9 +88,9 @@
   gap: 0.4rem;
   padding: 0.4rem 0.9rem;
   border-radius: 999px;
-  border: 1px solid var(--azul-borde);
-  background: var(--azul-superficie);
-  color: var(--texto-suave);
+  border: 1px solid var(--ficha-borde);
+  background: #ffffff;
+  color: var(--ficha-texto-suave);
   font: inherit;
   font-weight: 600;
   font-size: 0.85rem;

@@ -40,6 +40,7 @@ class EventoSalida(BaseModel):
     info_visible_config: dict[str, Any] | None
     cartel_url: str | None
     hora_programada_directo: datetime | None
+    inicio_directo: datetime | None
     creado_por: int
     creado_en: datetime
 

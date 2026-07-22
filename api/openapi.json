@@ -1852,6 +1852,75 @@
         }
       }
     },
+    "/distancias/{distancia_id}/corredores": {
+      "post": {
+        "tags": [
+          "corredores-admin"
+        ],
+        "summary": "Crear Corredor",
+        "description": "Alta individual (misma lógica que la importación de Excel, pero de uno en\nuno): matching por email y, si no, por teléfono; comprobación de dorsal\nduplicado antes de crear nada.",
+        "operationId": "crear_corredor_distancias__distancia_id__corredores_post",
+        "parameters": [
+          {
+            "name": "distancia_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Distancia Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InscripcionCrear"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PosicionPublica"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/distancias/{distancia_id}/corredores/{inscripcion_id}": {
       "put": {
         "tags": [
@@ -3021,6 +3090,18 @@
             ],
             "title": "Hora Programada Directo"
           },
+          "inicio_directo": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Inicio Directo"
+          },
           "creado_por": {
             "type": "integer",
             "title": "Creado Por"
@@ -3045,6 +3126,7 @@
           "info_visible_config",
           "cartel_url",
           "hora_programada_directo",
+          "inicio_directo",
           "creado_por",
           "creado_en"
         ],
@@ -3308,6 +3390,63 @@
         },
         "type": "object",
         "title": "InscripcionActualizar"
+      },
+      "InscripcionCrear": {
+        "properties": {
+          "dorsal": {
+            "type": "string",
+            "title": "Dorsal"
+          },
+          "nombre": {
+            "type": "string",
+            "title": "Nombre"
+          },
+          "apellidos": {
+            "type": "string",
+            "title": "Apellidos"
+          },
+          "club": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Club"
+          },
+          "email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email"
+          },
+          "telefono": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Telefono"
+          }
+        },
+        "type": "object",
+        "required": [
+          "dorsal",
+          "nombre",
+          "apellidos"
+        ],
+        "title": "InscripcionCrear",
+        "description": "Alta individual de un corredor en una distancia desde el panel (para los\nque se quedaron sin importar por Excel o para pruebas). Mismas reglas que la\nimportación (Anexo B §4, decisión 2026-07-19): nombre/apellidos/dorsal\nobligatorios y al menos uno de email/telefono."
       },
       "InscripcionEstadoSalida": {
         "properties": {

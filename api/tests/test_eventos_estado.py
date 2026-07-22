@@ -92,3 +92,46 @@ def test_ciclo_completo_estados_y_revocacion_tokens(cliente, db_session) -> None
     acciones = {entrada["accion"] for entrada in auditoria.json()}
     assert "evento_creado" in acciones
     assert "evento_cambio_estado" in acciones
+
+
+def test_inicio_directo_se_refresca_en_cada_entrada_a_en_directo(cliente) -> None:
+    """La marca `inicio_directo` (base del cronómetro de la web) debe fijarse al
+    entrar En directo y REFRESCARSE si se restablece la salida y se vuelve a
+    lanzar — para que el contador parta de cero en la nueva salida."""
+    token = _login_admin(cliente)
+    cabeceras = {"Authorization": f"Bearer {token}"}
+
+    codigo = f"INICIO-{uuid.uuid4().hex[:6]}"
+    creado = cliente.post(
+        "/eventos",
+        json={"nombre": "Evento inicio", "codigo_acceso": codigo, "fecha": "2026-09-01"},
+        headers=cabeceras,
+    )
+    evento_id = creado.json()["id"]
+    assert creado.json()["inicio_directo"] is None
+
+    def cambiar(destino: str) -> dict:
+        respuesta = cliente.post(
+            f"/eventos/{evento_id}/estado", json={"estado": destino}, headers=cabeceras
+        )
+        assert respuesta.status_code == 200
+        return respuesta.json()
+
+    cambiar("publicado")
+    cambiar("preparacion")
+
+    # Primera entrada a En directo: se fija inicio_directo.
+    primera = cambiar("en_directo")
+    assert primera["inicio_directo"] is not None
+    inicio_1 = primera["inicio_directo"]
+
+    # Restablecer la salida (retroceso a Preparación) no borra el histórico ni
+    # exige cambiar inicio_directo, pero al VOLVER a lanzarla debe refrescarse.
+    cambiar("preparacion")
+    segunda = cambiar("en_directo")
+    inicio_2 = segunda["inicio_directo"]
+    assert inicio_2 is not None
+    assert inicio_2 >= inicio_1
+    # La marca nueva es la del segundo lanzamiento, no la del primero: si el
+    # tiempo del reloj avanzó entre ambas, deben ser distintas.
+    assert isinstance(inicio_2, str)

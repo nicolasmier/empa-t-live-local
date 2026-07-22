@@ -17,10 +17,14 @@ android {
         versionCode = 1
         versionName = "0.1.0"
 
-        // Apuntando al `docker-compose.dev.yml` de este mismo repo (spec v10):
-        // 10.0.2.2 es el alias fijo del emulador de Android hacia el
-        // `localhost` del host que lo ejecuta.
-        buildConfigField("String", "BASE_URL", "\"http://10.0.2.2:8000\"")
+        // Por defecto apunta al emulador (10.0.2.2 = alias fijo hacia el
+        // `localhost` del host que lo ejecuta, ver docker-compose.dev.yml).
+        // Para un APK instalable en un móvil real, sobreescribir con
+        // `-PurlServidor=http://<ip-lan-del-servidor>:8000` (ver
+        // /instalableApp/README.md) — así el valor real de cada prueba de
+        // campo no queda hardcodeado en el repo.
+        val urlServidor = (project.findProperty("urlServidor") as String?) ?: "http://10.0.2.2:8000"
+        buildConfigField("String", "BASE_URL", "\"$urlServidor\"")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -83,8 +87,11 @@ dependencies {
 
     implementation("io.coil-kt:coil-compose:2.7.0")
     implementation("androidx.core:core-ktx:1.15.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")
     implementation("androidx.lifecycle:lifecycle-service:2.8.7")
+    // ProcessLifecycleOwner: saber si la app está en primer plano para no
+    // sondear el servidor de fondo cuando no hay pantalla que lo muestre
+    // (ver EstadoViewModel) — batería, no UX.
+    implementation("androidx.lifecycle:lifecycle-process:2.8.7")
 
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.9.0")

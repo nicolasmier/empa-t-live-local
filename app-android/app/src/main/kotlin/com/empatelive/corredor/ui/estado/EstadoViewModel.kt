@@ -5,6 +5,8 @@ import android.os.BatteryManager
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.empatelive.corredor.almacenamiento.SesionSeguraStorage
@@ -51,13 +53,24 @@ class EstadoViewModel(
 
         viewModelScope.launch {
             while (true) {
-                puntosPendientes = dao.contarPendientes()
-                bateriaPct = leerPorcentajeBateria()
-                sondearServidor()
+                // Batería: sin esto, el bucle seguía disparando un GET al
+                // servidor cada 5 s aunque el corredor apagara la pantalla o
+                // cambiara de app — el `Service` (que sí debe seguir vivo)
+                // mantiene el proceso en marcha, pero esta pantalla ya no la
+                // ve nadie, así que no hay razón para gastar radio en
+                // refrescarla (decisión 2026-07-19).
+                if (appEnPrimerPlano()) {
+                    puntosPendientes = dao.contarPendientes()
+                    bateriaPct = leerPorcentajeBateria()
+                    sondearServidor()
+                }
                 delay(INTERVALO_SONDEO_MS)
             }
         }
     }
+
+    private fun appEnPrimerPlano(): Boolean =
+        ProcessLifecycleOwner.get().lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)
 
     private suspend fun sondearServidor() {
         val tokenDispositivo = sesion.obtenerTokenDispositivo() ?: return

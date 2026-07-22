@@ -37,24 +37,42 @@ function App() {
   const [seleccionado, setSeleccionado] = useState<PosicionPublica | null>(null);
 
   useEffect(() => {
-    async function cargarEvento() {
+    let cancelado = false;
+
+    async function cargarEvento(primeraVez: boolean) {
       const { data, error } = await api.GET("/eventos/activo");
+      if (cancelado) return;
       if (error) {
-        setErrorEvento("No hay ningún evento publicado en este momento.");
+        if (primeraVez) setErrorEvento("No hay ningún evento publicado en este momento.");
         return;
       }
+      setErrorEvento(null);
+      // setEvento con la respuesta fresca en cada sondeo: así el cambio de
+      // estado (p. ej. reprogramar la salida) y la nueva `inicio_directo` se
+      // reflejan sin recargar la página.
       setEvento(data);
-      setFavoritos(cargarFavoritos(data.id));
 
-      const distanciasResp = await api.GET("/eventos/{evento_id}/distancias", {
-        params: { path: { evento_id: data.id } },
-      });
-      if (distanciasResp.data && distanciasResp.data.length > 0) {
-        setDistancias(distanciasResp.data);
-        setDistanciaId(distanciasResp.data[0].id);
+      if (primeraVez) {
+        setFavoritos(cargarFavoritos(data.id));
+        const distanciasResp = await api.GET("/eventos/{evento_id}/distancias", {
+          params: { path: { evento_id: data.id } },
+        });
+        if (cancelado) return;
+        if (distanciasResp.data && distanciasResp.data.length > 0) {
+          setDistancias(distanciasResp.data);
+          setDistanciaId(distanciasResp.data[0].id);
+        }
       }
     }
-    cargarEvento();
+
+    cargarEvento(true);
+    // Sondeo ligero del evento (estado + inicio_directo). Las posiciones tienen
+    // su propio polling más frecuente en usePosicionesPolling.
+    const id = setInterval(() => cargarEvento(false), 10000);
+    return () => {
+      cancelado = true;
+      clearInterval(id);
+    };
   }, []);
 
   const distanciaActual = distancias.find((d) => d.id === distanciaId) ?? null;
@@ -101,9 +119,9 @@ function App() {
   return (
     <>
       <Cabecera
-        eventoId={evento.id}
         nombreEvento={evento.nombre}
         enDirecto={evento.estado === "en_directo"}
+        inicioDirecto={evento.inicio_directo}
         conectado={conectado}
       />
 

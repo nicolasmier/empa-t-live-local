@@ -175,6 +175,11 @@ def cambiar_estado_evento(
     # programada pendiente: evita que una hora ya pasada dispare el paso a En
     # directo por sorpresa si el evento vuelve más tarde a Preparación.
     evento.hora_programada_directo = None
+    # Cada entrada a En directo refresca la marca de inicio, para que al
+    # restablecer la salida y volver a lanzarla el cronómetro de la web parta de
+    # cero (no se arrastra el tiempo de la salida anterior).
+    if datos.estado == "en_directo":
+        evento.inicio_directo = datetime.now(UTC)
 
     if datos.estado == "finalizado":
         revocar_tokens_dispositivo_evento(db, evento.id)

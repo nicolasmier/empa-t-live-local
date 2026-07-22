@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { resolverColorEstado, type components } from "@empatelive/web-shared";
 import { api, mensajeError } from "../../api";
 
@@ -163,6 +163,10 @@ export function Corredores({ eventoId, rolAdmin }: Props) {
           ))}
         </select>
       </label>
+
+      {rolAdmin && distanciaId !== null && (
+        <AltaCorredor distanciaId={distanciaId} onCreado={() => cargarCorredores(distanciaId)} />
+      )}
 
       {rolAdmin && distanciaId !== null && (
         <div className="formulario-tarjeta">
@@ -354,6 +358,122 @@ export function Corredores({ eventoId, rolAdmin }: Props) {
         </div>
       )}
     </div>
+  );
+}
+
+function AltaCorredor({
+  distanciaId,
+  onCreado,
+}: {
+  distanciaId: number;
+  onCreado: () => void;
+}) {
+  const [abierto, setAbierto] = useState(false);
+  const [dorsal, setDorsal] = useState("");
+  const [nombre, setNombre] = useState("");
+  const [apellidos, setApellidos] = useState("");
+  const [club, setClub] = useState("");
+  const [email, setEmail] = useState("");
+  const [telefono, setTelefono] = useState("");
+  const [guardando, setGuardando] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [aviso, setAviso] = useState<string | null>(null);
+
+  function limpiar() {
+    setDorsal("");
+    setNombre("");
+    setApellidos("");
+    setClub("");
+    setEmail("");
+    setTelefono("");
+  }
+
+  async function alGuardar(e: FormEvent) {
+    e.preventDefault();
+    setGuardando(true);
+    setError(null);
+    setAviso(null);
+    const { error } = await api.POST("/distancias/{distancia_id}/corredores", {
+      params: { path: { distancia_id: distanciaId } },
+      body: {
+        dorsal,
+        nombre,
+        apellidos,
+        club: club.trim() || null,
+        email: email.trim() || null,
+        telefono: telefono.trim() || null,
+      },
+    });
+    setGuardando(false);
+    if (error) {
+      setError(mensajeError(error, "No se pudo añadir el corredor."));
+      return;
+    }
+    setAviso(`Corredor con dorsal ${dorsal} añadido.`);
+    limpiar();
+    onCreado();
+  }
+
+  if (!abierto) {
+    return (
+      <div className="formulario-tarjeta">
+        <button type="button" onClick={() => setAbierto(true)}>
+          Añadir corredor
+        </button>
+        {aviso && <p className="aviso-ok">{aviso}</p>}
+      </div>
+    );
+  }
+
+  return (
+    <form className="formulario-tarjeta" onSubmit={alGuardar}>
+      <p className="salida-programada__titulo">Añadir corredor a esta distancia</p>
+      <p className="texto-vacio">
+        Para los que se quedaron sin importar por Excel o para hacer pruebas. Nombre,
+        apellidos y dorsal son obligatorios; email o teléfono, al menos uno.
+      </p>
+      <label>
+        Dorsal
+        <input value={dorsal} onChange={(e) => setDorsal(e.target.value)} required />
+      </label>
+      <label>
+        Nombre
+        <input value={nombre} onChange={(e) => setNombre(e.target.value)} required />
+      </label>
+      <label>
+        Apellidos
+        <input value={apellidos} onChange={(e) => setApellidos(e.target.value)} required />
+      </label>
+      <label>
+        Club (opcional)
+        <input value={club} onChange={(e) => setClub(e.target.value)} />
+      </label>
+      <label>
+        Email
+        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+      </label>
+      <label>
+        Teléfono
+        <input value={telefono} onChange={(e) => setTelefono(e.target.value)} />
+      </label>
+      <div className="formulario-tarjeta__acciones">
+        <button type="submit" disabled={guardando}>
+          {guardando ? "Añadiendo…" : "Añadir corredor"}
+        </button>
+        <button
+          type="button"
+          className="boton-enlace"
+          disabled={guardando}
+          onClick={() => {
+            setAbierto(false);
+            setError(null);
+          }}
+        >
+          Cerrar
+        </button>
+      </div>
+      {error && <p className="error">{error}</p>}
+    </form>
   );
 }
 

@@ -112,9 +112,10 @@ export function General({ evento, rolAdmin, onActualizado }: Props) {
             estadoActual={evento.estado as EstadoEvento}
             onCambiado={onActualizado}
           />
-          {evento.estado === "preparacion" && (
+          {(evento.estado === "preparacion" || evento.estado === "en_directo") && (
             <SalidaProgramada
               eventoId={evento.id}
+              estado={evento.estado}
               horaProgramada={evento.hora_programada_directo}
               onCambiado={onActualizado}
             />

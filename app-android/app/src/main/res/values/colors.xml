@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Azul marino del logo circular de CronoEmpate (favicon-512): el fondo del
+         icono adaptativo debe casar con el círculo para que no se vea un borde. -->
+    <color name="ic_launcher_background">#12194F</color>
+</resources>

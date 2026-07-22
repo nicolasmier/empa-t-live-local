@@ -37,6 +37,9 @@ def activar_salidas_programadas(db: Session | None = None) -> None:
             hora_programada = evento.hora_programada_directo
             evento.estado = "en_directo"
             evento.hora_programada_directo = None
+            # Marca de inicio para el cronómetro de la web (se refresca en cada
+            # entrada a En directo, ver Evento.inicio_directo).
+            evento.inicio_directo = ahora
             registrar_auditoria(
                 db,
                 evento.creado_por,

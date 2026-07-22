@@ -15,3 +15,7 @@ build/
 api/storage/
 cloudflared/credentials.json
 
+# APK de campo: atado a la IP LAN del momento y firmado con la clave de
+# depuración — artefacto de una prueba concreta, no algo para versionar.
+instalableApp/*.apk
+

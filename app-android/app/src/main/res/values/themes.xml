@@ -1,3 +1,6 @@
 <resources>
-    <style name="Theme.EmpateLiveCorredor" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.EmpateLiveCorredor" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">#17181C</item>
+        <item name="android:colorBackground">#17181C</item>
+    </style>
 </resources>

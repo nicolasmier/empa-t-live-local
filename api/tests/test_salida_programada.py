@@ -71,6 +71,8 @@ def test_activar_salidas_programadas_pasa_a_en_directo_si_ya_toca(cliente, db_se
     evento = db_session.get(Evento, evento_id)
     assert evento.estado == "en_directo"
     assert evento.hora_programada_directo is None
+    # La salida automática también marca inicio_directo (cronómetro de la web).
+    assert evento.inicio_directo is not None
 
     auditoria = (
         db_session.query(Auditoria)

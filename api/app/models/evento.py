@@ -43,6 +43,14 @@ class Evento(Base):
     hora_programada_directo: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True), nullable=True
     )
+    # Instante en que el evento entró (por última vez) En directo. Se refresca en
+    # CADA entrada a En directo —manual o por salida programada—, así que si se
+    # restablece la salida y se vuelve a lanzar, el cronómetro de la web parte de
+    # cero. Es la "hora de inicio" que faltaba en el modelo (antes la web la
+    # inventaba en localStorage y se quedaba con la primera).
+    inicio_directo: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
     creado_por: Mapped[int] = mapped_column(ForeignKey("usuarios.id"))
     creado_en: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
