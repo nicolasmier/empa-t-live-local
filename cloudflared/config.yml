@@ -12,11 +12,17 @@ credentials-file: /etc/cloudflared/credentials.json
 
 ingress:
   - hostname: api.observeweb.com
-    # Alcance idéntico al de cloudflared/nginx-verificacion.conf (Anexo B §2):
-    # login/registro de corredor, perfil propio + foto, unirse con código,
-    # estado de la inscripción, ingesta de posiciones. Nada de gestión.
-    path: ^/(auth/corredores/(registro|login)|corredores/[^/]+(/foto)?|eventos/codigo/[^/]+/unirse|inscripciones/[^/]+/estado|eventos/[^/]+/posiciones)$
+    # Alcance (Anexo B §2, idéntico a cloudflared/nginx-verificacion.conf). Dos
+    # bloques dentro de la misma regex:
+    #   1) API del corredor (escritura): login/registro, perfil propio + foto,
+    #      unirse con código, estado de la inscripción, ingesta de posiciones.
+    #   2) Lectura pública para la web de seguimiento en internet: evento activo,
+    #      distancias, posiciones por distancia, noticias, patrocinadores y los
+    #      media de fotos/gpx.
+    # NUNCA rutas de gestión, y `media/(fotos|gpx)/` deja FUERA `media/backups/`
+    # (los volcados cifrados de la BD se guardan en storage/backups → /media/backups).
+    path: ^/(auth/corredores/(registro|login)|corredores/[^/]+(/foto)?|eventos/codigo/[^/]+/unirse|inscripciones/[^/]+/estado|eventos/[^/]+/posiciones|eventos/activo|eventos/[^/]+/distancias|eventos/[^/]+/distancias/[^/]+/posiciones|eventos/[^/]+/(noticias|patrocinadores)|media/(fotos|gpx)/.+)$
     service: http://api:8000
-  # Catch-all: cualquier otra ruta (gestión, lectura pública, /media, /salud...)
-  # responde 404 en el propio túnel, sin llegar siquiera a la API.
+  # Catch-all: cualquier otra ruta (gestión, /media/backups, /salud...) responde
+  # 404 en el propio túnel, sin llegar siquiera a la API.
   - service: http_status:404

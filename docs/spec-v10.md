@@ -132,12 +132,25 @@ La plataforma trata datos personales y de geolocalización de personas identific
 ### Modelo
 Todo el sistema (API + PostgreSQL en Docker, panel, web pública) corre en el PC del Administrador. No hay nube.
 
-### Qué sale a internet y qué no (corrección v9)
+### Qué sale a internet y qué no (corrección v9; ampliado v10.1)
 | Superficie | Acceso | Motivo |
 |---|---|---|
 | API del corredor: login, unirse, perfil, estado, **ingesta de posiciones** | Internet, vía Cloudflare Tunnel | Los corredores no están en la LAN del recinto |
+| **API de lectura pública**: evento activo, distancias, posiciones por distancia, noticias, patrocinadores, y media de **fotos/gpx** (nunca `media/backups`) | Internet, vía Cloudflare Tunnel | Alimenta la web de seguimiento pública (ver abajo) |
+| **Web de seguimiento pública** (bundle estático en Cloudflare Pages) | Internet | Seguimiento de la carrera para cualquiera con el enlace; solo lectura |
 | Panel de administración (`:8080`) | Solo LAN | Lo usa el Administrador junto al PC |
-| Web pública (`:8081`) | Solo LAN | Pantalla del recinto, conectada por cable |
+| Web pública / pantalla del recinto (`:8081`) | Solo LAN | Pantalla del recinto, conectada por cable |
+
+> **Decisión v10.1 (2026-07-23) — seguimiento público.** Además de la pantalla
+> del recinto (LAN, `:8081`), se publica una **web de seguimiento en internet**:
+> un bundle estático de la web pública (mismo código, compilado con
+> `VITE_API_URL` apuntando al hostname del túnel) alojado en **Cloudflare Pages**
+> en el dominio del organizador. Los **datos** los sirve el mismo túnel, cuya
+> regex de ingress se amplía a los endpoints de **solo lectura** listados arriba.
+> Restricción de seguridad crítica: `media/(fotos|gpx)/` sí, pero **`media/backups`
+> NUNCA** (los volcados cifrados de la BD viven en `storage/backups`, servido bajo
+> `/media`). Implica exposición pública de nombres, club, foto y posición de los
+> corredores — asumido explícitamente por el organizador.
 
 ### Componentes
 - **Launcher gráfico**: Iniciar/Detener sin terminal; estado del servidor, del túnel, corredores transmitiendo e incidencias; IP:puerto y QR de las webs locales.
@@ -375,9 +388,13 @@ Job programado que, pasado el plazo definido en la política de privacidad [NEED
 |---|---|---|
 | **API del corredor** | `/auth/corredores/*`, `/corredores/{id}` (propio), `/corredores/{id}/foto`, `/eventos/codigo/{codigo}/unirse`, `/inscripciones/{id}/estado`, `/eventos/{id}/posiciones` | Internet (túnel) |
 | **API de gestión** | resto de endpoints (eventos, distancias, importación, contenido, incidencias, auditoría) | Solo LAN |
-| **API de lectura pública** | `GET /eventos/{id}/distancias/{did}/posiciones` y contenido del evento | Solo LAN |
+| **API de lectura pública** | `GET /eventos/activo`, `GET /eventos/{id}/distancias`, `GET /eventos/{id}/distancias/{did}/posiciones`, `GET /eventos/{id}/noticias`, `GET /eventos/{id}/patrocinadores`, `GET /media/(fotos\|gpx)/*` | Internet (túnel) — v10.1, para la web de seguimiento pública. **Nunca `/media/backups`.** |
 
-La separación se implementa a nivel de reverse proxy/túnel (el túnel solo enruta las rutas del corredor), no confiando únicamente en la autenticación.
+La separación se implementa a nivel de reverse proxy/túnel (el túnel enruta solo
+las rutas del corredor **y las de lectura pública**), no confiando únicamente en
+la autenticación. La regex de ingress excluye explícitamente `/media/backups`
+para que los volcados cifrados de la BD (en `storage/backups`, bajo el montaje
+`/media`) no sean alcanzables desde internet.
 
 ### 3. Autenticación
 | Token | Usuario | Vida | Alcance |
@@ -420,8 +437,9 @@ La separación se implementa a nivel de reverse proxy/túnel (el túnel solo enr
   - Tamaño máximo del lote: **500 puntos por petición**; si se excede, responde `413` con error claro y la app parte el lote (decisión clarify 2026-07-16).
   - Si el `{id}` de evento de la URL no corresponde al evento de la inscripción derivada del token, responde **`403`** con error claro (la identidad del token manda sobre la URL; decisión clarify 2026-07-16).
 
-### 6. Endpoint de lectura pública (LAN)
+### 6. Endpoints de lectura pública (LAN y, desde v10.1, internet)
 - `GET /eventos/{id}/distancias/{did}/posiciones` — por inscripción activa: dorsal, nombre, apellidos, club, foto_url, lat, lon, `timestamp_dispositivo` y `estado` calculado (`transmitiendo` / `sin_senal`) comparando con `umbral_sin_senal_seg`. Es el endpoint que sondea la pantalla cada 3–5 s.
+- Junto a él, la web de seguimiento pública (v10.1) consume `GET /eventos/activo`, `GET /eventos/{id}/distancias`, `GET /eventos/{id}/noticias`, `GET /eventos/{id}/patrocinadores` y los media `/media/(fotos|gpx)/*`. Todos de solo lectura y sin autenticación (Anexo B §6). En LAN se sirven por `:8081`; en internet, a través del túnel (Anexo B §2) hacia el bundle estático alojado en Cloudflare Pages.
 
 ### 7. Reglas anti-abuso
 - Ingesta: máx. 1 petición / 5 s por token de dispositivo.

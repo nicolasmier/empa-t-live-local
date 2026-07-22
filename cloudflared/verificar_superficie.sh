@@ -51,18 +51,31 @@ verificar_permitida GET /inscripciones/1/estado
 verificar_permitida POST /eventos/1/posiciones
 
 echo
-echo "=== Rutas de gestión / lectura pública (NO deben pasar el túnel) ==="
+echo "=== Lectura pública para la web de seguimiento (deben pasar el túnel) ==="
+verificar_permitida GET /eventos/activo
+verificar_permitida GET /eventos/1/distancias
+verificar_permitida GET /eventos/1/distancias/2/posiciones
+verificar_permitida GET /eventos/1/noticias
+verificar_permitida GET /eventos/1/patrocinadores
+verificar_permitida GET /media/fotos/1.jpg
+verificar_permitida GET /media/gpx/2.gpx
+
+echo
+echo "=== Rutas de gestión (NO deben pasar el túnel) ==="
 verificar_bloqueada POST /auth/login
 verificar_bloqueada GET /eventos
-verificar_bloqueada GET /eventos/1/distancias/2/posiciones
+verificar_bloqueada GET /eventos/1
 verificar_bloqueada GET /auditoria
 verificar_bloqueada GET /salud
-verificar_bloqueada GET /media/fotos/1.jpg
 verificar_bloqueada POST /distancias/1/gpx
 verificar_bloqueada POST /distancias/1/corredores/importar
+verificar_bloqueada POST /distancias/1/corredores
 verificar_bloqueada GET /operacion/resumen
-verificar_bloqueada GET /eventos/activo
-verificar_bloqueada GET /eventos/1/distancias
+
+echo
+echo "=== CRÍTICO: los backups de la BD NUNCA deben salir por el túnel ==="
+verificar_bloqueada GET /media/backups/dump.sql
+verificar_bloqueada GET /media/backups/evento-1.sql.gpg
 
 echo
 if [ "$FALLOS" -eq 0 ]; then
