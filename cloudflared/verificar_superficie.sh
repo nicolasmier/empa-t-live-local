@@ -59,6 +59,7 @@ verificar_permitida GET /eventos/1/noticias
 verificar_permitida GET /eventos/1/patrocinadores
 verificar_permitida GET /media/fotos/1.jpg
 verificar_permitida GET /media/gpx/2.gpx
+verificar_permitida GET /media/carteles/1.jpg
 
 echo
 echo "=== Rutas de gestión (NO deben pasar el túnel) ==="

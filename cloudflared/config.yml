@@ -19,9 +19,11 @@ ingress:
     #   2) Lectura pública para la web de seguimiento en internet: evento activo,
     #      distancias, posiciones por distancia, noticias, patrocinadores y los
     #      media de fotos/gpx.
-    # NUNCA rutas de gestión, y `media/(fotos|gpx)/` deja FUERA `media/backups/`
-    # (los volcados cifrados de la BD se guardan en storage/backups → /media/backups).
-    path: ^/(auth/corredores/(registro|login)|corredores/[^/]+(/foto)?|eventos/codigo/[^/]+/unirse|inscripciones/[^/]+/estado|eventos/[^/]+/posiciones|eventos/activo|eventos/[^/]+/distancias|eventos/[^/]+/distancias/[^/]+/posiciones|eventos/[^/]+/(noticias|patrocinadores)|media/(fotos|gpx)/.+)$
+    # NUNCA rutas de gestión, y `media/(fotos|gpx|carteles)/` deja FUERA
+    # `media/backups/` (los volcados cifrados de la BD se guardan en
+    # storage/backups → /media/backups). fotos=corredores, gpx=recorridos,
+    # carteles=cartel del evento (todo contenido público mostrado en la web).
+    path: ^/(auth/corredores/(registro|login)|corredores/[^/]+(/foto)?|eventos/codigo/[^/]+/unirse|inscripciones/[^/]+/estado|eventos/[^/]+/posiciones|eventos/activo|eventos/[^/]+/distancias|eventos/[^/]+/distancias/[^/]+/posiciones|eventos/[^/]+/(noticias|patrocinadores)|media/(fotos|gpx|carteles)/.+)$
     service: http://api:8000
   # Catch-all: cualquier otra ruta (gestión, /media/backups, /salud...) responde
   # 404 en el propio túnel, sin llegar siquiera a la API.
