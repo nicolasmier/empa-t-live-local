@@ -8,6 +8,9 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -111,18 +114,31 @@ class MainActivity : ComponentActivity() {
                         .fillMaxSize()
                         .background(MaterialTheme.colorScheme.background),
                 ) {
-                    // Fondo: el logo de la cabecera de la web (blanco) como marca
-                    // de agua tenue sobre el azul — misma identidad que la web.
-                    Image(
-                        painter = painterResource(R.drawable.logo_cabecera),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .align(Alignment.Center)
-                            .fillMaxWidth()
-                            .padding(horizontal = 32.dp),
-                        alpha = 0.08f,
-                        contentScale = ContentScale.FillWidth,
-                    )
+                    // Fondo: el logo de la cabecera (blanco) repetido en una
+                    // rejilla 2x2 que llena la pantalla — marca de agua siempre
+                    // visible, misma identidad que la web.
+                    Column(modifier = Modifier.fillMaxSize()) {
+                        repeat(2) {
+                            Row(modifier = Modifier.fillMaxWidth().weight(1f)) {
+                                repeat(2) {
+                                    Box(
+                                        modifier = Modifier.fillMaxHeight().weight(1f),
+                                        contentAlignment = Alignment.Center,
+                                    ) {
+                                        Image(
+                                            painter = painterResource(R.drawable.logo_cabecera),
+                                            contentDescription = null,
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(16.dp),
+                                            alpha = 0.10f,
+                                            contentScale = ContentScale.FillWidth,
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
 
                     Scaffold(
                         containerColor = Color.Transparent,
