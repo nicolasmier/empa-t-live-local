@@ -84,19 +84,19 @@
 .pie__autor-enlace {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
-  color: var(--texto-suave);
-  opacity: 0.7;
+  gap: 0.4rem;
+  color: var(--texto);
+  font-weight: 600;
   text-decoration: none;
 }
 
 .pie__autor-enlace:hover {
-  opacity: 1;
   text-decoration: underline;
 }
 
 .pie__github-icono {
   display: block;
+  color: var(--texto);
 }
 
 /* Modal del aviso legal. */

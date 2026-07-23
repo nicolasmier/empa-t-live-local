@@ -14,7 +14,6 @@ export function PieDePagina() {
       <div className="pie__contenido">
         <div className="pie__marca">
           <img className="pie__logo" src="/logo-horizontal.png" alt="CronoEmpate" />
-          <span className="pie__lema">Cronometraje deportivo</span>
         </div>
 
         <div className="pie__enlaces">
@@ -41,8 +40,8 @@ export function PieDePagina() {
           <svg
             className="pie__github-icono"
             viewBox="0 0 16 16"
-            width="16"
-            height="16"
+            width="22"
+            height="22"
             fill="currentColor"
             aria-hidden="true"
           >
