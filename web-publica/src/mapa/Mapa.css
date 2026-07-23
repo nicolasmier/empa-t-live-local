@@ -1,5 +1,9 @@
 .mapa {
   width: 100%;
+  /* Tope de ancho + centrado: en monitores anchos el mapa ya no se estira de
+     lado a lado; queda centrado como el resto del contenido (bloque inferior). */
+  max-width: 1200px;
+  margin-inline: auto;
   /* La proporción real se fija por JS en cuanto se conoce el bbox del GPX
      (para que el mapa se ciña al recorrido); esto es solo el estado inicial
      antes de esa medida. */

@@ -173,6 +173,13 @@ export function Mapa({
           mapa.fitBounds(limites, { padding: [12, 12] });
           limitesExpandidosRef.current = limitarAlejamiento(mapa, bboxTrazado);
         }
+
+        // Vista inicial: centrada en el INICIO del track (la salida queda
+        // siempre visible al abrir la web) y un punto más acercada que el
+        // encuadre completo, dejando margen para alejar (hasta ver el recorrido
+        // entero, minZoom) o acercar todavía más.
+        const zoomCompleto = mapa.getBoundsZoom(capa.getBounds(), false);
+        mapa.setView([puntos[0].lat, puntos[0].lon], Math.min(19, zoomCompleto + 1));
       })
       .catch(() => {
         // El trazado es decorativo: si falla la carga, el mapa sigue
