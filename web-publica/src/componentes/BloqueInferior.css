@@ -14,7 +14,10 @@
    única columna ocupe todo el ancho en vez de dejar un hueco vacío al lado. */
 .bloque-inferior__superior {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  /* `min(100%, 320px)`: en móviles más estrechos que 320px la columna no fuerza
+     un ancho mayor que el contenedor (evita el desbordamiento horizontal que
+     descolocaba el banner). En pantallas anchas sigue partiendo en 2 columnas. */
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
   gap: 2rem;
   align-items: start;
 }
