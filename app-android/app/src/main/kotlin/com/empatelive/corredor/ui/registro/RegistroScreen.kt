@@ -14,6 +14,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
@@ -28,10 +29,18 @@ fun RegistroScreen(
     contenedor: AppContainer,
     alRegistrarse: () -> Unit,
     irALogin: () -> Unit,
+    // Si llega con email (viene del login al detectar una cuenta pre-cargada sin
+    // activar), se rellena y se muestra el aviso de "primera vez".
+    emailInicial: String = "",
 ) {
     val vm: RegistroViewModel = viewModel(
         factory = ViewModelFactory { RegistroViewModel(contenedor.api, contenedor.sesion) },
     )
+
+    val vieneDeInscripcion = emailInicial.isNotBlank()
+    LaunchedEffect(emailInicial) {
+        if (vieneDeInscripcion && vm.email.isBlank()) vm.email = emailInicial
+    }
 
     Column(
         modifier = Modifier
@@ -39,7 +48,18 @@ fun RegistroScreen(
             .verticalScroll(rememberScrollState())
             .padding(24.dp),
     ) {
-        Text("Crear cuenta", style = MaterialTheme.typography.headlineSmall)
+        Text(
+            if (vieneDeInscripcion) "Activa tu cuenta" else "Crear cuenta",
+            style = MaterialTheme.typography.headlineSmall,
+        )
+        if (vieneDeInscripcion) {
+            Text(
+                "Tu inscripción ya está cargada. Crea una contraseña para activar tu " +
+                    "cuenta y poder entrar a la carrera.",
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
+            )
+        }
 
         OutlinedTextField(
             value = vm.nombre,

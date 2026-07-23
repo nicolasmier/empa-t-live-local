@@ -27,6 +27,7 @@ fun LoginScreen(
     contenedor: AppContainer,
     alIniciarSesion: () -> Unit,
     irARegistro: () -> Unit,
+    irARegistroConEmail: (String) -> Unit,
 ) {
     val vm: LoginViewModel = viewModel(
         factory = ViewModelFactory { LoginViewModel(contenedor.api, contenedor.sesion) },
@@ -70,7 +71,7 @@ fun LoginScreen(
         }
 
         Button(
-            onClick = { vm.iniciarSesion(alIniciarSesion) },
+            onClick = { vm.iniciarSesion(alIniciarSesion, irARegistroConEmail) },
             enabled = !vm.cargando,
             modifier = Modifier
                 .fillMaxWidth()

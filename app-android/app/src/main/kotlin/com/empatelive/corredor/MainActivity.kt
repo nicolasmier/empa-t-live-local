@@ -90,6 +90,9 @@ class MainActivity : ComponentActivity() {
                 val mostrarBarra = puedeVolver || esAutenticada
 
                 var confirmarCierre by remember { mutableStateOf(false) }
+                // Email a precargar en el registro cuando el login detecta una
+                // cuenta pre-cargada sin activar (vacío = registro manual normal).
+                var emailParaRegistro by remember { mutableStateOf("") }
 
                 // Logout: para la transmisión (si estuviera activa), limpia la
                 // sesión y el token de dispositivo (SesionSeguraStorage.cerrarSesion)
@@ -167,7 +170,14 @@ class MainActivity : ComponentActivity() {
                                             popUpTo(Rutas.LOGIN) { inclusive = true }
                                         }
                                     },
-                                    irARegistro = { navController.navigate(Rutas.REGISTRO) },
+                                    irARegistro = {
+                                        emailParaRegistro = ""
+                                        navController.navigate(Rutas.REGISTRO)
+                                    },
+                                    irARegistroConEmail = { email ->
+                                        emailParaRegistro = email
+                                        navController.navigate(Rutas.REGISTRO)
+                                    },
                                 )
                             }
                             composable(Rutas.REGISTRO) {
@@ -179,6 +189,7 @@ class MainActivity : ComponentActivity() {
                                         }
                                     },
                                     irALogin = { navController.popBackStack() },
+                                    emailInicial = emailParaRegistro,
                                 )
                             }
                             composable(Rutas.PERFIL) {

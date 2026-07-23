@@ -23,7 +23,11 @@ class LoginViewModel(
     var error by mutableStateOf<String?>(null)
         private set
 
-    fun iniciarSesion(alExito: () -> Unit) {
+    /** `alCuentaPreCargada`: la cuenta existe pero aún no tiene contraseña
+     * (pre-cargada por el organizador). En vez de un error sin salida, se lleva
+     * al corredor al registro con su email ya puesto para que cree la contraseña
+     * y active la cuenta. */
+    fun iniciarSesion(alExito: () -> Unit, alCuentaPreCargada: (String) -> Unit) {
         if (email.isBlank() || password.isBlank()) {
             error = "Introduce tu email y contraseña."
             return
@@ -45,7 +49,12 @@ class LoginViewModel(
                     sesion.guardarSesion(corredorId, resultado.datos.accessToken)
                     alExito()
                 }
-                is ResultadoApi.Error -> error = resultado.mensaje
+                is ResultadoApi.Error ->
+                    if (resultado.codigo == "cuenta_no_activada") {
+                        alCuentaPreCargada(email.trim())
+                    } else {
+                        error = resultado.mensaje
+                    }
             }
         }
     }

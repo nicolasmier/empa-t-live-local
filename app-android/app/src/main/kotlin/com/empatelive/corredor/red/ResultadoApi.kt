@@ -9,7 +9,13 @@ import retrofit2.Response
  * de la app trabaja contra este tipo, nunca contra `Response<T>` directamente. */
 sealed interface ResultadoApi<out T> {
     data class Ok<T>(val datos: T) : ResultadoApi<T>
-    data class Error(val mensaje: String, val codigoHttp: Int?) : ResultadoApi<Nothing>
+    // `codigo` es el `code` de la API (p. ej. "cuenta_no_activada"); permite a la
+    // UI reaccionar a un caso concreto sin comparar cadenas de mensaje.
+    data class Error(
+        val mensaje: String,
+        val codigoHttp: Int?,
+        val codigo: String? = null,
+    ) : ResultadoApi<Nothing>
 }
 
 private val jsonLaxo = Json { ignoreUnknownKeys = true }
@@ -25,9 +31,12 @@ suspend fun <T> llamarApi(block: suspend () -> Response<T>): ResultadoApi<T> {
                 ResultadoApi.Error("El servidor respondió sin contenido.", respuesta.code())
             }
         } else {
-            val mensaje = respuesta.errorBody().aMensajeDeError(jsonLaxo)
-                ?: "Error del servidor (${respuesta.code()})."
-            ResultadoApi.Error(mensaje, respuesta.code())
+            val detalle = respuesta.errorBody().aErrorApi(jsonLaxo)
+            ResultadoApi.Error(
+                mensaje = detalle?.message ?: "Error del servidor (${respuesta.code()}).",
+                codigoHttp = respuesta.code(),
+                codigo = detalle?.code,
+            )
         }
     } catch (e: IOException) {
         ResultadoApi.Error("No se pudo conectar con el servidor. Comprueba tu conexión.", null)

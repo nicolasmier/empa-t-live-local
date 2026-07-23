@@ -63,9 +63,10 @@ interface ApiService {
 }
 
 /** Retrofit no expone el cuerpo del error en `Response.errorBody()` ya
- * parseado — hay que decodificarlo a mano contra [ErrorApiEnvoltorio]. */
-fun ResponseBody?.aMensajeDeError(json: kotlinx.serialization.json.Json): String? {
+ * parseado — hay que decodificarlo a mano contra [ErrorApiEnvoltorio].
+ * Devuelve el detalle completo (code + message) para que la UI pueda
+ * distinguir casos concretos (p. ej. cuenta pre-cargada sin activar). */
+fun ResponseBody?.aErrorApi(json: kotlinx.serialization.json.Json): ErrorApiDetalle? {
     val texto = this?.string() ?: return null
-    return runCatching { json.decodeFromString<ErrorApiEnvoltorio>(texto).error.message }
-        .getOrNull()
+    return runCatching { json.decodeFromString<ErrorApiEnvoltorio>(texto).error }.getOrNull()
 }
