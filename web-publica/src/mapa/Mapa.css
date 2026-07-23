@@ -32,7 +32,10 @@
 .marcador-corredor__anillo img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  /* `contain` (no `cover`): la foto se ve COMPLETA dentro del círculo, sin
+     recortar los lados; el fondo blanco del anillo rellena el hueco si la
+     foto no es cuadrada (las fotos conservan su relación de aspecto). */
+  object-fit: contain;
 }
 
 /* Leaflet: quitar el fondo/sombra por defecto de los divIcon. */
