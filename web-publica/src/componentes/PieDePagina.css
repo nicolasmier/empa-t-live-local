@@ -1,0 +1,146 @@
+.pie {
+  margin-top: auto;
+  background: var(--azul-oscuro);
+  border-top: 1px solid var(--azul-borde);
+  padding: 1.5rem 1.25rem 1rem;
+}
+
+.pie__contenido {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1.5rem;
+}
+
+.pie__marca {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.pie__logo {
+  height: 30px;
+  width: auto;
+  display: block;
+}
+
+.pie__lema {
+  color: var(--texto-suave);
+  font-size: 0.9rem;
+}
+
+.pie__enlaces {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--texto-suave);
+  font-size: 0.85rem;
+}
+
+.pie__enlaces a,
+.pie__legal {
+  color: var(--texto-suave);
+  text-decoration: none;
+}
+
+.pie__enlaces a:hover,
+.pie__legal:hover {
+  color: var(--texto);
+  text-decoration: underline;
+}
+
+.pie__separador {
+  opacity: 0.5;
+}
+
+.pie__legal {
+  border: none;
+  background: none;
+  font: inherit;
+  padding: 0;
+  cursor: pointer;
+}
+
+/* Contacto del autor: siempre abajo del todo y a la derecha. */
+.pie__autor {
+  max-width: 1100px;
+  margin: 0.75rem auto 0;
+  text-align: right;
+  font-size: 0.78rem;
+}
+
+.pie__autor a {
+  color: var(--texto-suave);
+  opacity: 0.7;
+  text-decoration: none;
+}
+
+.pie__autor a:hover {
+  opacity: 1;
+  text-decoration: underline;
+}
+
+/* Modal del aviso legal. */
+.pie-modal__fondo {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  background: rgba(6, 12, 40, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+}
+
+.pie-modal {
+  background: var(--azul-superficie);
+  border: 1px solid var(--azul-borde);
+  border-radius: 14px;
+  padding: 1.5rem 1.5rem 1.25rem;
+  max-width: 440px;
+  width: 100%;
+  color: var(--texto);
+  box-shadow: 0 20px 50px rgba(2, 6, 30, 0.5);
+}
+
+.pie-modal h2 {
+  margin: 0 0 0.75rem;
+  font-size: 1.15rem;
+}
+
+.pie-modal p {
+  margin: 0 0 0.75rem;
+  color: var(--texto-suave);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.pie-modal a {
+  color: var(--azul-acento);
+}
+
+.pie-modal__cerrar {
+  margin-top: 0.5rem;
+  padding: 0.5rem 1.1rem;
+  border-radius: 999px;
+  border: none;
+  background: var(--azul-acento);
+  color: #fff;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+@media (max-width: 560px) {
+  .pie__contenido {
+    justify-content: center;
+    text-align: center;
+  }
+  .pie__autor {
+    text-align: center;
+  }
+}

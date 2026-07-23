@@ -5,6 +5,7 @@ import { BloqueInferior } from "./componentes/BloqueInferior";
 import { Cabecera } from "./componentes/Cabecera";
 import { Filtros, type ModoFiltro } from "./componentes/Filtros";
 import { FichaCorredor } from "./componentes/FichaCorredor";
+import { PieDePagina } from "./componentes/PieDePagina";
 import { Mapa, type BBox } from "./mapa/Mapa";
 import type { PosicionPublica } from "./mapa/interpolacion";
 import { usePosicionesPolling } from "./mapa/usePosicionesPolling";
@@ -166,6 +167,8 @@ function App() {
       )}
 
       <BloqueInferior eventoId={evento.id} cartelUrl={evento.cartel_url} estado={estado} />
+
+      <PieDePagina />
     </>
   );
 }
