@@ -1,11 +1,16 @@
 package com.empatelive.corredor.ui.unirse
 
+import android.app.Activity
+import android.content.Context
+import android.content.ContextWrapper
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -16,13 +21,29 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
+import com.empatelive.corredor.BuildConfig
 import com.empatelive.corredor.di.AppContainer
 import com.empatelive.corredor.ui.ViewModelFactory
 import com.empatelive.corredor.ui.estado.PanelEstado
+
+/** Desenvuelve el Context de Compose hasta la Activity, para poder minimizar
+ * la app (`moveTaskToBack`) sin parar el servicio de transmisión. */
+private fun Context.buscarActivity(): Activity? {
+    var contexto: Context? = this
+    while (contexto is ContextWrapper) {
+        if (contexto is Activity) return contexto
+        contexto = contexto.baseContext
+    }
+    return null
+}
 
 @Composable
 fun UnirseScreen(contenedor: AppContainer) {
@@ -32,6 +53,7 @@ fun UnirseScreen(contenedor: AppContainer) {
 
     val dorsal = vm.dorsal
     if (dorsal != null) {
+        val contexto = LocalContext.current
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -39,11 +61,38 @@ fun UnirseScreen(contenedor: AppContainer) {
                 .padding(24.dp),
             verticalArrangement = Arrangement.Center,
         ) {
+            // Foto de perfil (si el corredor subió una): se sirve en ruta
+            // relativa, hay que anteponer la base como en PerfilScreen.
+            val fotoAMostrar: Any? = vm.fotoUrl?.let { ruta ->
+                if (ruta.startsWith("http")) ruta else BuildConfig.BASE_URL + ruta
+            }
+            if (fotoAMostrar != null) {
+                AsyncImage(
+                    model = fotoAMostrar,
+                    contentDescription = "Tu foto",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(96.dp)
+                        .align(Alignment.CenterHorizontally)
+                        .clip(CircleShape),
+                )
+            }
+
             Text(
-                "Ya estás unido",
+                "En carrera",
                 style = MaterialTheme.typography.headlineSmall,
-                modifier = Modifier.align(Alignment.CenterHorizontally),
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(top = if (fotoAMostrar != null) 12.dp else 0.dp),
             )
+            vm.nombreCorredor?.let { nombre ->
+                Text(
+                    nombre,
+                    style = MaterialTheme.typography.titleMedium,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth().padding(top = 2.dp),
+                )
+            }
             Text(
                 vm.distanciaNombre ?: "",
                 style = MaterialTheme.typography.bodyLarge,
@@ -53,7 +102,7 @@ fun UnirseScreen(contenedor: AppContainer) {
                 dorsal,
                 fontSize = 72.sp,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth().padding(top = 24.dp),
+                modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
             )
             Text(
                 "Tu dorsal",
@@ -66,9 +115,28 @@ fun UnirseScreen(contenedor: AppContainer) {
 
             TransmisionSeccion()
 
+            // Minimizar de forma segura: manda la app al fondo (como el botón
+            // Inicio) SIN parar el servicio de ubicación. El foreground service
+            // sigue transmitiendo con la pantalla apagada y la UI sin dibujarse,
+            // que es el menor consumo posible. NO es cerrar la app (deslizarla en
+            // recientes sí la para, stopWithTask): por eso "de manera segura".
+            Button(
+                onClick = { contexto.buscarActivity()?.moveTaskToBack(true) },
+                modifier = Modifier.fillMaxWidth().padding(top = 24.dp),
+            ) {
+                Text("Minimizar y ahorrar batería")
+            }
+            Text(
+                "Sigue transmitiendo con la pantalla apagada. No cierres la app " +
+                    "deslizándola: eso sí detiene la transmisión.",
+                style = MaterialTheme.typography.bodySmall,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth().padding(top = 6.dp),
+            )
+
             OutlinedButton(
                 onClick = vm::unirseAOtroEvento,
-                modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 32.dp),
+                modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 24.dp),
             ) {
                 Text("Unirme a otro evento")
             }

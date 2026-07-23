@@ -36,6 +36,33 @@ class UnirseViewModel(
     var distanciaNombre by mutableStateOf(sesion.obtenerDistanciaNombre())
         private set
 
+    // Nombre y foto del corredor para la pantalla "En carrera": no vienen en el
+    // token ni en `unirse`, así que se leen del perfil (GET /corredores/{id}).
+    var nombreCorredor by mutableStateOf<String?>(null)
+        private set
+    var fotoUrl by mutableStateOf<String?>(null)
+        private set
+
+    init {
+        cargarPerfilBasico()
+    }
+
+    private fun cargarPerfilBasico() {
+        val corredorId = sesion.obtenerCorredorId() ?: return
+        viewModelScope.launch {
+            // Silencioso a propósito: la pantalla funciona igual sin foto/nombre
+            // (dorsal + distancia bastan); esto solo los añade si están.
+            when (val resultado = llamarApi { api.obtenerPerfil(corredorId) }) {
+                is ResultadoApi.Ok -> {
+                    nombreCorredor =
+                        "${resultado.datos.nombre} ${resultado.datos.apellidos}".trim()
+                    fotoUrl = resultado.datos.fotoUrl
+                }
+                is ResultadoApi.Error -> Unit
+            }
+        }
+    }
+
     fun unirse() {
         val codigoLimpio = codigo.trim().uppercase()
         val dorsalLimpio = dorsalIntroducido.trim()
