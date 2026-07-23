@@ -14,30 +14,24 @@
 
 .cabecera-banner {
   width: 100%;
-  max-width: 1200px;
-  aspect-ratio: 21 / 6;
-  min-height: 110px;
-  max-height: 260px;
+  /* Misma proporción que la imagen (1200x630 = 40/21): así el banner se ve
+     ENTERO en cualquier pantalla, sin recortar ni el logo ni el tagline. El
+     max-width evita que en escritorio quede excesivamente alto. */
+  max-width: 780px;
+  aspect-ratio: 40 / 21;
   border-radius: 22px;
-  background-image: linear-gradient(180deg, rgba(6, 12, 48, 0.15), rgba(6, 12, 48, 0.35)),
+  background-image: linear-gradient(180deg, rgba(6, 12, 48, 0.12), rgba(6, 12, 48, 0.28)),
     url("/cabecera.jpg");
   background-size: cover;
-  /* `center 30%`: muestra algo más de la zona superior de la imagen (el logo
-     queda completo con más margen arriba) sin descentrarlo horizontalmente. */
-  background-position: center 30%;
+  background-position: center;
   box-shadow:
     0 16px 40px rgba(2, 6, 30, 0.45),
     0 2px 8px rgba(2, 6, 30, 0.3);
 }
 
-/* En móvil la caja 21:6 es una tira demasiado fina y recorta mucho el logo: se
-   le da una proporción más alta para que el logo se vea completo y centrado. */
 @media (max-width: 640px) {
   .cabecera-banner-envoltorio {
     padding: 1rem 1rem 0;
-  }
-  .cabecera-banner {
-    aspect-ratio: 16 / 7;
   }
 }
 
