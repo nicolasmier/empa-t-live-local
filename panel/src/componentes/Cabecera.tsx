@@ -29,6 +29,16 @@ export function Cabecera({ titulo, rol, vista, onIrListado, onIrAuditoria, onCer
         >
           Auditoría
         </button>
+        <button
+          type="button"
+          className="enlace-nav"
+          onClick={() =>
+            window.open(`${window.location.protocol}//${window.location.hostname}:8081`, "_blank")
+          }
+          title="Abrir la web pública de seguimiento en una pestaña nueva"
+        >
+          Ver web pública ↗
+        </button>
         {rol && <span className="cabecera-panel__rol">{rol === "admin" ? "Administrador" : "Operador"}</span>}
         <button type="button" onClick={onCerrarSesion}>
           Cerrar sesión
