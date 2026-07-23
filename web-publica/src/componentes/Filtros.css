@@ -2,11 +2,12 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  /* Alineada con el mapa (mismo max-width y centrado): así los controles quedan
-     dentro de la mitad izquierda del mapa, no repartidos por todo el ancho. */
+  /* Alineada con el mapa (mismo max-width y centrado, y SIN padding horizontal
+     igual que el mapa): el borde izquierdo de los controles coincide con el
+     borde izquierdo del mapa. */
   max-width: 1200px;
   margin-inline: auto;
-  padding: 0.75rem 1.25rem;
+  padding: 0.75rem 0;
   flex-wrap: wrap;
 }
 
