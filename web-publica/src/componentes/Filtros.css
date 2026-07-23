@@ -2,6 +2,10 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  /* Alineada con el mapa (mismo max-width y centrado): así los controles quedan
+     dentro de la mitad izquierda del mapa, no repartidos por todo el ancho. */
+  max-width: 1200px;
+  margin-inline: auto;
   padding: 0.75rem 1.25rem;
   flex-wrap: wrap;
 }
@@ -15,7 +19,9 @@
   background: var(--azul-superficie);
   border: 1px solid var(--azul-borde);
   color: var(--texto-suave);
-  flex: 1 1 180px;
+  /* Ancho fijo y sin crecer: la caja de buscar dorsal ya no se estira a lo
+     largo; se queda compacta junto a los chips, en la izquierda. */
+  flex: 0 1 200px;
   min-width: 140px;
 }
 
