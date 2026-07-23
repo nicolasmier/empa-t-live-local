@@ -25,7 +25,12 @@ class Settings(BaseSettings):
     salida_programada_intervalo_seg: int = 10
     # Primer Administrador (docker-compose.prod.yml): la contraseña se genera al
     # azar y se imprime una única vez en el arranque (scripts/bootstrap_admin.py).
-    admin_bootstrap_email: str = "admin@localhost"
+    # Cuenta genérica del proyecto (CronoEmpate). El panel/`/auth/login` es
+    # LAN-only (nunca sale por el túnel, Anexo B §2), así que esta credencial
+    # solo es usable desde la red del recinto; aun así, para un evento real
+    # conviene cambiarla por una propia (variables de entorno).
+    admin_bootstrap_email: str = "admin@cronoempate.com"
+    admin_bootstrap_password: str = "123@cronoempate"
 
 
 settings = Settings()

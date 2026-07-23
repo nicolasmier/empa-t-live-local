@@ -46,7 +46,8 @@ function App() {
   if (!sesion) {
     return (
       <div className="pantalla-login">
-        <h1>EmpateLive — Panel</h1>
+        <img className="pantalla-login__logo" src="/cronoempate-logo.png" alt="CronoEmpate" />
+        <h1>Panel de administración</h1>
         <form onSubmit={alEnviarLogin}>
           <p>
             <input

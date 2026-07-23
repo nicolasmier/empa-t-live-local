@@ -25,6 +25,20 @@ body {
   margin: 0;
 }
 
+/* Marca de agua del logo de CronoEmpate de fondo en toda la parte admin. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-image: url("/cronoempate-logo.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: min(560px, 55vw);
+  opacity: 0.06;
+  pointer-events: none;
+}
+
 h1,
 h2,
 h3 {
@@ -159,10 +173,24 @@ tr.fila-clicable:hover {
   padding: 2rem;
   background: var(--superficie);
   border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(10, 18, 64, 0.12);
+  text-align: center;
+}
+
+.pantalla-login__logo {
+  width: 220px;
+  max-width: 80%;
+  height: auto;
+  display: block;
+  margin: 0 auto 1.25rem;
+}
+
+.pantalla-login form {
+  text-align: left;
 }
 
 .pantalla-login h1 {
-  font-size: 1.4rem;
+  font-size: 1.1rem;
   margin-bottom: 1.5rem;
   color: var(--azul-oscuro);
 }

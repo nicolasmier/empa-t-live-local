@@ -1,8 +1,10 @@
-"""Crea la primera cuenta de Administrador si todavía no existe ninguna.
+"""Crea la cuenta genérica de Administrador si todavía no existe ninguna.
 
 Idempotente: si ya hay un usuario con rol admin, no hace nada. Pensado para el
-arranque del stack de producción (docker-compose.prod.yml), donde NO se ejecuta
-el seed de desarrollo (crearía cuentas con contraseñas conocidas públicamente).
+arranque del stack de producción (docker-compose.prod.yml). Usa las credenciales
+de `settings.admin_bootstrap_email` / `admin_bootstrap_password` (por defecto la
+cuenta genérica del proyecto, CronoEmpate); si `admin_bootstrap_password` se deja
+vacío, se genera una aleatoria y se imprime una sola vez.
 """
 
 import secrets
@@ -24,7 +26,7 @@ def run(db: Session | None = None) -> None:
             print(f"Ya existe un Administrador ({existente.email}); no se crea ninguno nuevo.")
             return
 
-        password = secrets.token_urlsafe(12)
+        password = settings.admin_bootstrap_password or secrets.token_urlsafe(12)
         usuario = Usuario(
             nombre="Administrador",
             email=settings.admin_bootstrap_email,
@@ -37,8 +39,11 @@ def run(db: Session | None = None) -> None:
         print("=" * 64)
         print("Cuenta de Administrador creada:")
         print(f"  Email:    {settings.admin_bootstrap_email}")
-        print(f"  Password: {password}")
-        print("Guarda esta contraseña ahora: no se volverá a mostrar.")
+        if settings.admin_bootstrap_password:
+            print("  Password: (la configurada en admin_bootstrap_password)")
+        else:
+            print(f"  Password: {password}")
+            print("Guarda esta contraseña ahora: no se volverá a mostrar.")
         print("=" * 64)
     finally:
         if debe_cerrar:
