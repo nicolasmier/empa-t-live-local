@@ -90,6 +90,7 @@ export function BloqueInferior({ eventoId, cartelUrl, estado }: Props) {
         <summary className="listado-desplegable__resumen">
           <h3>Corredores ({corredores.length})</h3>
         </summary>
+        <div className="listado-scroll">
         <table className="listado">
           <thead>
             <tr>
@@ -121,6 +122,7 @@ export function BloqueInferior({ eventoId, cartelUrl, estado }: Props) {
             ))}
           </tbody>
         </table>
+        </div>
       </details>
     </section>
   );
