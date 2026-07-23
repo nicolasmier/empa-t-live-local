@@ -1,4 +1,5 @@
 import io
+import time
 
 from fastapi import APIRouter, Depends, UploadFile
 from sqlalchemy.orm import Session
@@ -61,7 +62,12 @@ def subir_foto(
     imagen.save(buffer, format="JPEG", quality=85)
     destino.write_bytes(buffer.getvalue())
 
-    corredor.foto_url = url_publica("fotos", f"{corredor_id}.jpg")
+    # `?v=timestamp`: el fichero se guarda siempre como {id}.jpg (misma ruta), así
+    # que sin este parámetro la URL no cambia al reemplazar la foto y los clientes
+    # (Coil en la app, el navegador en la web) servirían la imagen cacheada. El
+    # servidor de estáticos ignora el query string, pero al cambiar la URL fuerza
+    # la recarga de la nueva imagen.
+    corredor.foto_url = f"{url_publica('fotos', f'{corredor_id}.jpg')}?v={int(time.time())}"
     db.commit()
     db.refresh(corredor)
     return corredor

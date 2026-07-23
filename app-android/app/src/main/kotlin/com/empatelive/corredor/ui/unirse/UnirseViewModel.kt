@@ -44,10 +44,13 @@ class UnirseViewModel(
         private set
 
     init {
-        cargarPerfilBasico()
+        refrescarPerfil()
     }
 
-    private fun cargarPerfilBasico() {
+    /** Recarga nombre/foto del perfil. Público para poder refrescar al volver a
+     * esta pantalla tras cambiar la foto en Perfil (la URL trae `?v=` nuevo, así
+     * que Coil descarga la imagen nueva en vez de la cacheada). */
+    fun refrescarPerfil() {
         val corredorId = sesion.obtenerCorredorId() ?: return
         viewModelScope.launch {
             // Silencioso a propósito: la pantalla funciona igual sin foto/nombre

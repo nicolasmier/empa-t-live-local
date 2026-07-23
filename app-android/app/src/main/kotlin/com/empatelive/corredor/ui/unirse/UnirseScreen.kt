@@ -3,14 +3,16 @@ package com.empatelive.corredor.ui.unirse
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -19,14 +21,20 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.empatelive.corredor.BuildConfig
@@ -54,6 +62,23 @@ fun UnirseScreen(contenedor: AppContainer) {
     val dorsal = vm.dorsal
     if (dorsal != null) {
         val contexto = LocalContext.current
+
+        // Recarga el perfil cada vez que la pantalla vuelve a primer plano (p. ej.
+        // tras cambiar la foto en Perfil y volver): así toma la nueva `foto_url`
+        // con `?v=` y Coil descarga la imagen nueva.
+        val lifecycleOwner = LocalLifecycleOwner.current
+        DisposableEffect(lifecycleOwner) {
+            val observador = LifecycleEventObserver { _, evento ->
+                if (evento == Lifecycle.Event.ON_RESUME) vm.refrescarPerfil()
+            }
+            lifecycleOwner.lifecycle.addObserver(observador)
+            onDispose { lifecycleOwner.lifecycle.removeObserver(observador) }
+        }
+
+        val fotoAMostrar: Any? = vm.fotoUrl?.let { ruta ->
+            if (ruta.startsWith("http")) ruta else BuildConfig.BASE_URL + ruta
+        }
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -61,55 +86,79 @@ fun UnirseScreen(contenedor: AppContainer) {
                 .padding(24.dp),
             verticalArrangement = Arrangement.Center,
         ) {
-            // Foto de perfil (si el corredor subió una): se sirve en ruta
-            // relativa, hay que anteponer la base como en PerfilScreen.
-            val fotoAMostrar: Any? = vm.fotoUrl?.let { ruta ->
-                if (ruta.startsWith("http")) ruta else BuildConfig.BASE_URL + ruta
-            }
-            if (fotoAMostrar != null) {
-                AsyncImage(
-                    model = fotoAMostrar,
-                    contentDescription = "Tu foto",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .size(96.dp)
-                        .align(Alignment.CenterHorizontally)
-                        .clip(CircleShape),
-                )
-            }
-
-            Text(
-                "En carrera",
-                style = MaterialTheme.typography.headlineSmall,
+            // Cabecera "hero": la foto grande como CAPA INFERIOR, con el texto
+            // (En carrera, nombre y dorsal) encima. Si no hay foto, el mismo
+            // bloque sin imagen de fondo.
+            Box(
                 modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .padding(top = if (fotoAMostrar != null) 12.dp else 0.dp),
-            )
-            vm.nombreCorredor?.let { nombre ->
-                Text(
-                    nombre,
-                    style = MaterialTheme.typography.titleMedium,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth().padding(top = 2.dp),
-                )
+                    .fillMaxWidth()
+                    .height(320.dp)
+                    .clip(RoundedCornerShape(20.dp)),
+                contentAlignment = Alignment.Center,
+            ) {
+                if (fotoAMostrar != null) {
+                    AsyncImage(
+                        model = fotoAMostrar,
+                        contentDescription = "Tu foto",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize(),
+                    )
+                    // Velo oscuro para que el texto se lea sobre la foto.
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(
+                                Brush.verticalGradient(
+                                    listOf(
+                                        Color(0x66000000),
+                                        Color(0x22000000),
+                                        Color(0xAA000000),
+                                    ),
+                                ),
+                            ),
+                    )
+                }
+
+                Column(
+                    modifier = Modifier.fillMaxWidth().padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Text(
+                        "En carrera",
+                        style = MaterialTheme.typography.headlineSmall,
+                        color = Color.White,
+                    )
+                    vm.nombreCorredor?.let { nombre ->
+                        Text(
+                            nombre,
+                            style = MaterialTheme.typography.titleMedium,
+                            color = Color.White,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth().padding(top = 2.dp),
+                        )
+                    }
+                    Text(
+                        vm.distanciaNombre ?: "",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = Color.White,
+                        modifier = Modifier.padding(top = 4.dp),
+                    )
+                    Text(
+                        dorsal,
+                        fontSize = 72.sp,
+                        color = Color.White,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                    )
+                    Text(
+                        "Tu dorsal",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.White,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
             }
-            Text(
-                vm.distanciaNombre ?: "",
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 4.dp),
-            )
-            Text(
-                dorsal,
-                fontSize = 72.sp,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
-            )
-            Text(
-                "Tu dorsal",
-                textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.fillMaxWidth(),
-            )
 
             PanelEstado(contenedor)
 
