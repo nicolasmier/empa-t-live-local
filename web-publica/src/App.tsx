@@ -81,6 +81,31 @@ function App() {
 
   const { estado, conectado } = usePosicionesPolling(evento?.id ?? null, distanciaId);
 
+  // Alinea la barra de filtros con el borde izquierdo y el ancho REALES del mapa.
+  // El mapa se centra y su tamaño depende de la forma del recorrido (para rutas
+  // verticales queda estrecho y centrado), así que no basta con CSS: se mide el
+  // mapa y se aplican margen/ancho a los filtros, re-midiendo al cambiar tamaño.
+  useEffect(() => {
+    if (!evento || distanciaId === null) return;
+    const filtros = document.querySelector<HTMLElement>(".filtros");
+    const mapa = document.querySelector<HTMLElement>(".mapa");
+    if (!filtros || !mapa) return;
+    const alinear = () => {
+      filtros.style.maxWidth = "none";
+      filtros.style.width = `${mapa.offsetWidth}px`;
+      filtros.style.marginLeft = `${mapa.offsetLeft}px`;
+      filtros.style.marginRight = "0";
+    };
+    alinear();
+    const observador = new ResizeObserver(alinear);
+    observador.observe(mapa);
+    window.addEventListener("resize", alinear);
+    return () => {
+      observador.disconnect();
+      window.removeEventListener("resize", alinear);
+    };
+  }, [evento, distanciaId]);
+
   const mostrarCorredor = useMemo(() => {
     const dorsalBuscado = textoDorsal.trim();
     return (posicion: PosicionPublica) => {
