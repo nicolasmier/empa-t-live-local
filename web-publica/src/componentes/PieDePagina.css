@@ -9,10 +9,10 @@
   max-width: 1100px;
   margin: 0 auto;
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem 1.5rem;
+  text-align: center;
+  gap: 0.6rem;
 }
 
 .pie__marca {
@@ -68,20 +68,35 @@
 /* Contacto del autor: siempre abajo del todo y a la derecha. */
 .pie__autor {
   max-width: 1100px;
-  margin: 0.75rem auto 0;
-  text-align: right;
+  margin: 1rem auto 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.4rem;
   font-size: 0.78rem;
+  color: var(--texto-suave);
 }
 
-.pie__autor a {
+.pie__autor-texto {
+  opacity: 0.7;
+}
+
+.pie__autor-enlace {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
   color: var(--texto-suave);
   opacity: 0.7;
   text-decoration: none;
 }
 
-.pie__autor a:hover {
+.pie__autor-enlace:hover {
   opacity: 1;
   text-decoration: underline;
+}
+
+.pie__github-icono {
+  display: block;
 }
 
 /* Modal del aviso legal. */
@@ -136,11 +151,7 @@
 }
 
 @media (max-width: 560px) {
-  .pie__contenido {
-    justify-content: center;
-    text-align: center;
-  }
   .pie__autor {
-    text-align: center;
+    justify-content: center;
   }
 }
