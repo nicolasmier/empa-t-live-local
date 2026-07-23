@@ -21,6 +21,7 @@ aquí discrepa del código, revísalo: manda la spec.
 - [TransmisionGpsYSinConexion](TransmisionGpsYSinConexion.md) — foreground service, cola offline, batería, cerrar la app.
 - [IngestaDePosiciones](IngestaDePosiciones.md) — cómo procesa el servidor los puntos GPS.
 - [CompilarEInstalarApk](CompilarEInstalarApk.md) — generar el APK y qué hacer si cambia la IP.
+- [PersistenciaLoginApp](PersistenciaLoginApp.md) — dónde persisten las credenciales y la sesión de un corredor.
 
 ### Arquitectura, red y seguridad
 - [ComoLleganLosDatosDelMovil](ComoLleganLosDatosDelMovil.md) — el túnel de Cloudflare (corredores fuera de la LAN).
